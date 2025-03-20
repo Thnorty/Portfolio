@@ -163,3 +163,41 @@ style.textContent = `
 `;
 
 document.head.appendChild(style);
+
+// Dark Mode Functionality
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+// Function to toggle dark mode
+function toggleDarkMode(isDark) {
+    if (isDark) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// Check for saved theme preference or use the system preference
+const savedTheme = localStorage.getItem('theme');
+
+if (savedTheme === 'dark' || (!savedTheme && prefersDarkScheme.matches)) {
+    toggleDarkMode(true);
+} else {
+    toggleDarkMode(false);
+}
+
+// Toggle theme when button is clicked
+themeToggleBtn.addEventListener('click', () => {
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    toggleDarkMode(!isDarkMode);
+});
+
+// Listen for changes in system theme
+prefersDarkScheme.addEventListener('change', (e) => {
+    // Only change theme automatically if user hasn't set a preference
+    if (!localStorage.getItem('theme')) {
+        toggleDarkMode(e.matches);
+    }
+});
