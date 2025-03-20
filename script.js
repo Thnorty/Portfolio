@@ -64,11 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Prevent scrolling on page reload
-    if (window.history.scrollRestoration) {
-        window.history.scrollRestoration = 'manual';
-    }
-    
     // Add active class to nav items on scroll - with some delay
     setTimeout(() => {
         window.addEventListener('scroll', () => {
@@ -79,7 +74,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
                 const navbarHeight = document.querySelector('#navbar').offsetHeight;
                 
                 if (pageYOffset >= sectionTop - navbarHeight - 100) {
