@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { animate, stagger } from "animejs";
+import { animate, stagger, createTimeline, svg } from "animejs";
 
 // CV Data
 const cvData = {
@@ -217,71 +217,103 @@ export default function Portfolio() {
         });
     }
 
-    // Observer for scrolling animations
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: "0px"
-    };
+    // Scroll scrubbing animation logic
+    const sections = [
+        { ref: aboutRef, selector: '.anim-item' },
+        { ref: expRef, selector: '.exp-card' },
+        { ref: projectsRef, selector: '.project-card' },
+        { ref: skillsRef, selector: '.skill-badge' }, 
+        { ref: eduRef, selector: '.edu-item' },
+        { ref: contactRef, selector: '.group' }
+    ];
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const target = entry.target as HTMLElement;
-          target.classList.remove('opacity-0'); // Revealing logic if needed
-          
-          if (target.dataset.animated === 'true') return;
-          target.dataset.animated = 'true';
+    const animations: any[] = [];
 
-          if (target === aboutRef.current) {
-            animate(target.querySelectorAll('.anim-item'), {
-              translateY: [20, 0],
-              opacity: [0, 1],
-              delay: stagger(100),
-              duration: 800,
-              ease: 'outExpo'
-            });
-          } else if (target === expRef.current) {
-            animate(target.querySelectorAll('.exp-card'), {
-                translateX: [-20, 0],
-                opacity: [0, 1],
-                delay: stagger(150),
-                duration: 800,
-                ease: 'outQuad'
-            });
-          } else if (target === projectsRef.current) {
-             animate(target.querySelectorAll('.project-card'), {
-                scale: [0.9, 1],
-                opacity: [0, 1],
-                delay: stagger(100),
-                duration: 800,
-                ease: 'outBack'
-            });
-          } else if (target === skillsRef.current) {
-             animate(target.querySelectorAll('.skill-badge'), {
-                scale: [0, 1],
-                opacity: [0, 1],
-                delay: stagger(50),
-                duration: 600,
-                ease: 'outElastic(1, .6)'
-            });
-          } else if (target === eduRef.current) {
-             animate(target.querySelectorAll('.edu-item'), {
-                translateY: [20, 0],
-                opacity: [0, 1],
-                delay: stagger(150),
-                duration: 800,
-                ease: 'outQuart'
-            });
-          }
-        }
-      });
-    }, observerOptions);
+    // Create a timeline for each section
+    sections.forEach(({ ref, selector }) => {
+        if (!ref.current) return;
+        const target = ref.current;
+        
+        // Ensure initial state
+        target.classList.remove('opacity-0');
+        const elements = target.querySelectorAll(selector);
+        
+        // Initial setup for scrubbed elements
+        elements.forEach((el: any) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(50px)';
+        });
 
-    [aboutRef, expRef, projectsRef, skillsRef, eduRef, contactRef].forEach(ref => {
-        if (ref.current) observer.observe(ref.current);
+        const tl = createTimeline({
+            autoplay: false,
+            duration: 1000,
+            playbackEase: 'linear'
+        });
+
+        tl.add(elements, {
+            opacity: [0, 1],
+            translateY: [50, 0],
+            delay: stagger(100),
+            duration: 1000,
+            ease: 'outQuad'
+        });
+
+        animations.push({ tl, element: target });
     });
 
-    return () => observer.disconnect();
+    const onScroll = () => {
+        const windowHeight = window.innerHeight;
+        const scrollY = window.scrollY;
+
+        animations.forEach(({ tl, element }) => {
+            const rect = element.getBoundingClientRect();
+            // Start animating when the top of the element enters the bottom of the viewport
+            // End when the center of the element is in the center of the viewport (or slightly offset)
+            
+            const elementTop = rect.top + scrollY;
+            const elementHeight = rect.height;
+            const start = elementTop - windowHeight * 0.9; // Start slightly before it enters
+            const end = elementTop + elementHeight * 0.2; // End when scrolled in a bit
+
+            let progress = (scrollY - start) / (end - start);
+            progress = Math.max(0, Math.min(1, progress));
+            
+            tl.seek(tl.duration * progress);
+        });
+        
+        // Parallax for Hero
+        if (headerRef.current) {
+            const offset = window.scrollY * 0.5;
+            headerRef.current.style.transform = `translateY(${offset}px)`;
+            headerRef.current.style.opacity = `${1 - window.scrollY / 700}`;
+        }
+    };
+
+    window.addEventListener('scroll', onScroll);
+    onScroll(); // Initial check
+
+    // Signature Animation
+    const signatureTl = createTimeline({
+        defaults: { ease: 'easeInOutSine' }
+    });
+    
+    // We need to ensure the svg path exists before animating
+    const signaturePath = document.querySelector('.signature-text');
+    if (signaturePath) {
+        // In Anime.js v4, creates a drawable for stroke animation
+        // For text elements, we use CSS stroke-dashoffset primarily, or createDrawable if compatible
+        // Let's use the createDrawable helper which is designed for this
+        const drawable = svg.createDrawable('.signature-text');
+        
+        signatureTl.add(drawable, {
+            draw: '0 1',
+            duration: 4500,
+        })
+    }
+
+    return () => {
+        window.removeEventListener('scroll', onScroll);
+    };
   }, []);
 
   return (
@@ -316,10 +348,19 @@ export default function Portfolio() {
 
       {/* Hero Section */}
       <section ref={headerRef} className="pt-32 pb-20 px-6 max-w-5xl mx-auto min-h-[80vh] flex flex-col justify-center">
-        <h2 className="hero-anim opacity-0 text-green-600 dark:text-green-400 font-bold mb-4 tracking-wide text-sm uppercase">Portfolio</h2>
-        <h1 className="hero-anim opacity-0 text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-gray-900 dark:text-gray-50">
-          Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-green-400 dark:from-green-400 dark:to-green-300">{cvData.personal.name}</span>.
-        </h1>
+        <div className="hero-anim opacity-0 mb-6 flex flex-wrap items-baseline gap-4">
+            <span className="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">Hi, I'm</span>
+            <div className="inline-block">
+                <svg width="400" height="1" className="overflow-visible w-[280px] md:w-[400px]">
+                     <text x="0" y="0" 
+                           className="signature-text text-6xl md:text-8xl font-anta fill-transparent stroke-green-600 dark:stroke-green-400 stroke-2"
+                           style={{ fontFamily: 'var(--font-anta)', fillOpacity: 0 }}
+                     >
+                        {cvData.personal.name}
+                     </text>
+                </svg>
+            </div>
+        </div>
         <p className="hero-anim opacity-0 text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-2xl leading-relaxed mb-8">
           {cvData.personal.title}. Specialists in IoT, Machine Learning, and Full Stack Development.
         </p>
