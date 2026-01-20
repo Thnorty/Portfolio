@@ -173,18 +173,20 @@ export default function Portfolio() {
   const handleLinkHover = (e: React.MouseEvent<HTMLElement>) => {
      animate(e.currentTarget, {
         translateY: -2,
-        color: '#2563eb', // blue-600
         duration: 200,
         ease: 'outQuad'
      });
   };
 
   const handleLinkLeave = (e: React.MouseEvent<HTMLElement>) => {
-    animate(e.currentTarget, {
+    const target = e.currentTarget;
+    animate(target, {
         translateY: 0,
-        color: '#374151', // gray-700 or whatever default was
         duration: 200,
-        ease: 'outQuad'
+        ease: 'outQuad',
+        onComplete: () => {
+             target.style.transform = '';
+        }
      });
   };
 
@@ -275,7 +277,7 @@ export default function Portfolio() {
       });
     }, observerOptions);
 
-    [aboutRef, expRef, projectsRef, skillsRef, eduRef].forEach(ref => {
+    [aboutRef, expRef, projectsRef, skillsRef, eduRef, contactRef].forEach(ref => {
         if (ref.current) observer.observe(ref.current);
     });
 
@@ -290,12 +292,12 @@ export default function Portfolio() {
           <div className="font-bold text-xl tracking-tighter text-gray-900 dark:text-white">ON.</div>
           <div className="flex items-center gap-6">
             <nav className="hidden md:flex gap-6 text-sm font-medium">
-                <a href="#about" onClick={(e) => handleScroll(e, 'about')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300">About</a>
-                <a href="#experience" onClick={(e) => handleScroll(e, 'experience')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300">Experience</a>
-                <a href="#projects" onClick={(e) => handleScroll(e, 'projects')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300">Projects</a>
-                <a href="#education" onClick={(e) => handleScroll(e, 'education')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300">Education</a>
-                <a href="#skills" onClick={(e) => handleScroll(e, 'skills')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300">Skills</a>
-                <a href="#contact" onClick={(e) => handleScroll(e, 'contact')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300">Contact</a>
+                <a href="#about" onClick={(e) => handleScroll(e, 'about')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">About</a>
+                <a href="#experience" onClick={(e) => handleScroll(e, 'experience')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">Experience</a>
+                <a href="#projects" onClick={(e) => handleScroll(e, 'projects')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">Projects</a>
+                <a href="#education" onClick={(e) => handleScroll(e, 'education')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">Education</a>
+                <a href="#skills" onClick={(e) => handleScroll(e, 'skills')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">Skills</a>
+                <a href="#contact" onClick={(e) => handleScroll(e, 'contact')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">Contact</a>
             </nav>
             <button 
                 onClick={toggleTheme} 
@@ -314,22 +316,22 @@ export default function Portfolio() {
 
       {/* Hero Section */}
       <section ref={headerRef} className="pt-32 pb-20 px-6 max-w-5xl mx-auto min-h-[80vh] flex flex-col justify-center">
-        <h2 className="hero-anim opacity-0 text-blue-600 dark:text-blue-400 font-bold mb-4 tracking-wide text-sm uppercase">Portfolio</h2>
+        <h2 className="hero-anim opacity-0 text-green-600 dark:text-green-400 font-bold mb-4 tracking-wide text-sm uppercase">Portfolio</h2>
         <h1 className="hero-anim opacity-0 text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-gray-900 dark:text-gray-50">
-          Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">{cvData.personal.name}</span>.
+          Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-green-400 dark:from-green-400 dark:to-green-300">{cvData.personal.name}</span>.
         </h1>
         <p className="hero-anim opacity-0 text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-2xl leading-relaxed mb-8">
           {cvData.personal.title}. Specialists in IoT, Machine Learning, and Full Stack Development.
         </p>
         <div className="hero-anim opacity-0 flex gap-4">
-          <a href="#contact" onClick={(e) => handleScroll(e, 'contact')} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="px-8 py-3 bg-blue-600 dark:bg-blue-600 text-white font-semibold rounded-full shadow-lg shadow-blue-600/30 hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors">
+          <a href="#contact" onClick={(e) => handleScroll(e, 'contact')} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="px-8 py-3 bg-green-600 dark:bg-green-600 text-white font-semibold rounded-full shadow-lg shadow-green-600/30 hover:bg-green-700 dark:hover:bg-green-500 transition-colors">
             Get in Touch
           </a>
           <a href={cvData.personal.github} target="_blank" onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="px-8 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 font-semibold rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
             GitHub
           </a>
           {cvData.personal.linkedin && (
-             <a href={cvData.personal.linkedin} target="_blank" onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="px-8 py-3 bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-400 border border-gray-200 dark:border-gray-700 font-semibold rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+             <a href={cvData.personal.linkedin} target="_blank" onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="px-8 py-3 bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 border border-gray-200 dark:border-gray-700 font-semibold rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 LinkedIn
              </a>
           )}
@@ -346,17 +348,17 @@ export default function Portfolio() {
       </section>
 
       {/* Experience Section */}
-      <section id="experience" ref={expRef} className="py-20 px-6 max-w-5xl mx-auto opacity-0 transition-opacity duration-500 bg-white dark:bg-gray-900 rounded-3xl shadow-sm my-10 border border-gray-100 dark:border-gray-800 transition-colors duration-300">
-        <h3 className="text-3xl font-bold mb-12 text-gray-900 dark:text-white border-l-4 border-blue-600 dark:border-blue-500 pl-4">Work Experience</h3>
-        <div className="space-y-12">
+      <section id="experience" ref={expRef} className="py-20 px-6 max-w-5xl mx-auto opacity-0 transition-opacity duration-500">
+        <h3 className="text-3xl font-bold mb-12 text-gray-900 dark:text-white border-l-4 border-green-600 dark:border-green-500 pl-4">Work Experience</h3>
+        <div className="space-y-8">
           {cvData.experience.map((job, idx) => (
-            <div key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="exp-card opacity-0 grid md:grid-cols-4 gap-4 p-4 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800">
+            <div key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="exp-card opacity-0 grid md:grid-cols-4 gap-4 p-8 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm transition-colors">
               <div className="text-gray-500 dark:text-gray-400 text-sm font-semibold tracking-wider uppercase">
                 {job.date}
               </div>
               <div className="md:col-span-3">
                 <h4 className="text-xl font-bold text-gray-900 dark:text-white">{job.role}</h4>
-                <div className="text-blue-600 dark:text-blue-400 font-medium mb-3">{job.company}</div>
+                <div className="text-green-600 dark:text-green-400 font-medium mb-3">{job.company}</div>
                 <ul className="list-disc list-outside ml-4 space-y-2 text-gray-600 dark:text-gray-400">
                   {job.details.map((detail, i) => (
                     <li key={i}>{detail}</li>
@@ -370,7 +372,7 @@ export default function Portfolio() {
 
       {/* Projects Section */}
       <section id="projects" ref={projectsRef} className="py-20 px-6 max-w-5xl mx-auto opacity-0 transition-opacity duration-500">
-        <h3 className="text-3xl font-bold mb-12 border-l-4 border-purple-600 dark:border-purple-500 pl-4 text-gray-900 dark:text-white">Projects</h3>
+        <h3 className="text-3xl font-bold mb-12 border-l-4 border-green-600 dark:border-green-500 pl-4 text-gray-900 dark:text-white">Projects</h3>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {cvData.projects.map((project, idx) => (
             <div key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="project-card opacity-0 bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-md border border-gray-100 dark:border-gray-800 flex flex-col justify-between transition-colors">
@@ -381,7 +383,7 @@ export default function Portfolio() {
                 </p>
               </div>
               {project.link && (
-                <a href={project.link} target="_blank" className="text-blue-600 dark:text-blue-400 text-sm font-semibold hover:underline mt-auto">
+                <a href={project.link} target="_blank" className="text-green-600 dark:text-green-400 text-sm font-semibold hover:underline mt-auto">
                   View Project &rarr;
                 </a>
               )}
@@ -414,13 +416,13 @@ export default function Portfolio() {
 
       {/* Skills Section */}
       <section id="skills" ref={skillsRef} className="py-20 px-6 max-w-5xl mx-auto opacity-0 transition-opacity duration-500">
-        <h3 className="text-3xl font-bold mb-12 border-l-4 border-pink-600 dark:border-pink-500 pl-4 text-gray-900 dark:text-white">Skills</h3>
+        <h3 className="text-3xl font-bold mb-12 border-l-4 border-green-600 dark:border-green-500 pl-4 text-gray-900 dark:text-white">Skills</h3>
         
         <div className="mb-8">
             <h4 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Core Technologies</h4>
             <div className="flex flex-wrap gap-2">
                 {cvData.skills.languages.concat(cvData.skills.technologies).map((skill, idx) => (
-                    <span key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="skill-badge opacity-0 px-4 py-2 bg-gray-900 dark:bg-gray-800 text-white dark:text-gray-200 rounded-lg text-sm font-medium cursor-default inline-block transition-colors border border-transparent dark:border-gray-700">
+                    <span key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="skill-badge opacity-0 px-4 py-2 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-800 shadow-sm cursor-default inline-block transition-colors">
                         {skill}
                     </span>
                 ))}
@@ -431,7 +433,7 @@ export default function Portfolio() {
             <h4 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Languages</h4>
             <div className="flex flex-wrap gap-2">
                 {cvData.skills.humanLanguages.map((lang, idx) => (
-                    <span key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="skill-badge opacity-0 px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-700 cursor-default inline-block transition-colors">
+                    <span key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="skill-badge opacity-0 px-4 py-2 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-800 shadow-sm cursor-default inline-block transition-colors">
                         {lang}
                     </span>
                 ))}
@@ -439,19 +441,49 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* Contact */}
-      <footer id="contact" ref={contactRef} className="bg-gray-900 dark:bg-black text-white py-20 px-6 transition-colors duration-300">
-        <div className="max-w-5xl mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-8 text-white">Let's Connect</h2>
-            <div className="flex flex-wrap justify-center gap-8 mb-12">
-                <a href={`mailto:${cvData.personal.email}`} className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">{cvData.personal.email}</a>
-                {cvData.personal.linkedin && <a href={cvData.personal.linkedin} className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">LinkedIn</a>}
-                {cvData.personal.github && <a href={cvData.personal.github} className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">GitHub</a>}
-            </div>
-            <p className="text-gray-500 dark:text-gray-600 text-sm">
-                &copy; {new Date().getFullYear()} {cvData.personal.name}. All rights reserved.
-            </p>
+      {/* Contact Section */}
+      <section id="contact" ref={contactRef} className="py-20 px-6 max-w-5xl mx-auto opacity-0 transition-opacity duration-500">
+        <h3 className="text-3xl font-bold mb-12 border-l-4 border-green-600 dark:border-green-500 pl-4 text-gray-900 dark:text-white">Let's Connect</h3>
+        <div className="grid md:grid-cols-3 gap-6">
+            <a href={`mailto:${cvData.personal.email}`} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="flex flex-col items-center text-center p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-100 dark:border-gray-800 transition-colors hover:border-green-200 dark:hover:border-green-800 group">
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-full text-green-600 dark:text-green-400 mb-4 group-hover:bg-green-50 dark:group-hover:bg-gray-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8 w-8 h-8">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                    </svg>
+                </div>
+                <span className="text-gray-900 dark:text-white font-bold text-lg mb-1">Email</span>
+                <span className="text-gray-500 dark:text-gray-400 text-sm">{cvData.personal.email}</span>
+            </a>
+            
+            {cvData.personal.linkedin && (
+                <a href={cvData.personal.linkedin} target="_blank" onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="flex flex-col items-center text-center p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-100 dark:border-gray-800 transition-colors hover:border-green-200 dark:hover:border-green-800 group">
+                    <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-full text-green-600 dark:text-green-400 mb-4 group-hover:bg-green-50 dark:group-hover:bg-gray-700 transition-colors">
+                        <svg fill="currentColor" viewBox="0 0 24 24" className="size-8 w-8 h-8">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                    </div>
+                    <span className="text-gray-900 dark:text-white font-bold text-lg mb-1">LinkedIn</span>
+                    <span className="text-gray-500 dark:text-gray-400 text-sm">Professional Profile</span>
+                </a>
+            )}
+
+            {cvData.personal.github && (
+                <a href={cvData.personal.github} target="_blank" onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="flex flex-col items-center text-center p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-100 dark:border-gray-800 transition-colors hover:border-green-200 dark:hover:border-green-800 group">
+                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-full text-green-600 dark:text-green-400 mb-4 group-hover:bg-green-50 dark:group-hover:bg-gray-700 transition-colors">
+                        <svg fill="currentColor" viewBox="0 0 24 24" className="size-8 w-8 h-8">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </div>
+                    <span className="text-gray-900 dark:text-white font-bold text-lg mb-1">GitHub</span>
+                    <span className="text-gray-500 dark:text-gray-400 text-sm">Code Repositories</span>
+                </a>
+            )}
         </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-8 text-center text-gray-400 dark:text-gray-600 text-sm">
+        <p>&copy; {new Date().getFullYear()} {cvData.personal.name}. All rights reserved.</p>
       </footer>
     </main>
   );
