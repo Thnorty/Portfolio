@@ -15,6 +15,7 @@ type Media = {
   alt: string;
   width: number;
   height: number;
+  round?: boolean; // Circular crop, e.g. round watch faces
 };
 
 type Project = {
@@ -27,6 +28,15 @@ type Project = {
   tech: string[];
   links?: ExternalLink[];
   media?: Media[];
+  figures?: Figure[];
+};
+
+type EducationDetail = { label: string; text: string; link?: { id: string; label: string } };
+
+type Figure = {
+  diagram: keyof typeof diagrams;
+  title: string;
+  caption: string;
 };
 
 const cvData = {
@@ -55,9 +65,9 @@ const cvData = {
       degree: "MSc in Electronic & Computer Technology (Major in IoT)",
       honours: "First Class Honours (1.1)",
       details: [
-        { label: "Thesis", text: "Hardware Acceleration of Multi-Task Convolutional Neural Networks on RISC-V Architectures" },
+        { label: "Thesis", text: "Hardware Acceleration of Multi-Task Convolutional Neural Networks on RISC-V Architectures", link: { id: "tinykittinet", label: "See TinyKITTINet" } },
         { label: "Coursework", text: "Network Stack Implementation (Linux kernel internals in C), Data Analysis, Machine Learning, Wireless Communications, Security for Edge Networks" },
-      ],
+      ] as EducationDetail[],
     },
     {
       school: "TOBB University of Economics and Technology",
@@ -67,7 +77,7 @@ const cvData = {
       details: [
         { label: "Graduation Project", text: "Automated Story Generation and Multimodal Rendering Engine" },
         { label: "Coursework", text: "Big Data (AWS S3/Lambda, Kubernetes), Parallel Processing, Deep Learning, Machine Learning, Computer Vision" },
-      ],
+      ] as EducationDetail[],
     },
   ],
   experience: [
@@ -150,6 +160,14 @@ const cvData = {
         "Local-first Android training app with a Wear OS companion, released at v1.0.2. A multi-module Gradle project with baseline profiles, a catalogue of 1,324 animated exercises, and full English and Turkish support. No account, no backend and no telemetry.",
       tech: ["Kotlin", "Android", "Wear OS", "Gradle"],
       links: [{ label: "GitHub", href: "https://github.com/Thnorty/RepForth" }],
+      media: [
+        { type: "image", src: "/projects/repforth/training.webp", alt: "A set in progress: the exercise animation, the rep target as one large number, and Log set", width: 540, height: 1130 },
+        { type: "image", src: "/projects/repforth/rest.webp", alt: "A rest counting down on a ring, with the next set's animation and prescription under it", width: 540, height: 1130 },
+        { type: "image", src: "/projects/repforth/catalog.webp", alt: "The exercise catalogue, searchable and filtered, with 1,324 exercises", width: 540, height: 1130 },
+        { type: "image", src: "/projects/repforth/progress.webp", alt: "Progress: workouts, volume, streak and a history list", width: 540, height: 1130 },
+        { type: "image", src: "/projects/repforth/watch-set.webp", alt: "Wear OS: the watch showing ten reps, set 1 of 2, and a Log set button", width: 360, height: 360, round: true },
+        { type: "image", src: "/projects/repforth/watch-rest.webp", alt: "Wear OS: the watch counting a rest down on an amber ring, naming what comes next", width: 360, height: 360, round: true },
+      ],
     },
     {
       name: "Cairn",
@@ -193,9 +211,14 @@ const cvData = {
       subtitle: "Hardware-Accelerated Multi-Task CNN",
       date: "2026",
       featured: true,
+      award: "MSc Thesis · Dublin City University",
       description:
-        "33.7k-parameter INT8 CNN for road perception on KITTI (classification, bounding box and depth), running on a dedicated Verilog accelerator in a PicoRV32 soft-core SoC. 4–6× fewer cycles than out-of-order x86/RISC-V baselines in gem5, with bit-identical integer results verified from PyTorch QAT through C models to RTL testbenches.",
+        "My MSc thesis: a 33.7k-parameter INT8 CNN for road perception on KITTI that predicts class, bounding box and depth, running on a dedicated Verilog accelerator in a PicoRV32 soft-core SoC. It takes 4–6× fewer cycles than out-of-order x86 and RISC-V baselines in gem5.",
       tech: ["Verilog", "RISC-V", "gem5", "PyTorch"],
+      figures: [
+        { diagram: "soc", title: "System", caption: "The PicoRV32 core drives the dedicated Verilog CNN accelerator through memory-mapped registers, and the SoC returns all three task outputs." },
+        { diagram: "verification", title: "Verification", caption: "The PyTorch QAT model, the C reference model and the RTL testbench share one source of truth, and the harness checks that their integer outputs are bit-identical." },
+      ],
     },
     {
       name: "eBPF/XDP DDoS Mitigation",
@@ -299,6 +322,103 @@ function ProjectLinks({ links }: { links: ExternalLink[] }) {
   );
 }
 
+const box = "fill-white dark:fill-neutral-900 stroke-neutral-300 dark:stroke-neutral-700";
+const accentBox = "fill-green-50 dark:fill-green-950 stroke-green-500 dark:stroke-green-700";
+const mainText = "fill-neutral-800 dark:fill-neutral-100 text-[12px] font-semibold";
+const subText = "fill-neutral-500 dark:fill-neutral-400 text-[10px]";
+const wire = "stroke-neutral-400 dark:stroke-neutral-500";
+
+function ArrowMarker({ id }: { id: string }) {
+  return (
+    <marker id={id} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" className="fill-neutral-400 dark:fill-neutral-500" />
+    </marker>
+  );
+}
+
+function SocDiagram() {
+  return (
+    <svg viewBox="0 0 360 190" className="w-full h-auto" role="img" aria-label="A KITTI frame enters the PicoRV32 SoC, where the PicoRV32 core drives the INT8 CNN accelerator through memory-mapped registers; the SoC outputs class, bounding box and depth">
+      <defs><ArrowMarker id="soc-arrow" /></defs>
+      <rect x="1" y="71" width="62" height="48" rx="6" className={box} />
+      <text x="32" y="92" textAnchor="middle" className={mainText}>KITTI</text>
+      <text x="32" y="107" textAnchor="middle" className={subText}>frame</text>
+      <line x1="63" y1="95" x2="86" y2="95" className={wire} markerEnd="url(#soc-arrow)" />
+
+      <rect x="88" y="4" width="182" height="182" rx="10" fill="none" strokeDasharray="5 4" className="stroke-green-500 dark:stroke-green-600" />
+      <text x="179" y="21" textAnchor="middle" className="fill-green-600 dark:fill-green-400 text-[10px] font-bold tracking-wider">PICORV32 SOC</text>
+      <rect x="102" y="30" width="154" height="44" rx="6" className={box} />
+      <text x="179" y="49" textAnchor="middle" className={mainText}>PicoRV32 core</text>
+      <text x="179" y="64" textAnchor="middle" className={subText}>RV32 soft-core CPU</text>
+      <line x1="122" y1="76" x2="122" y2="110" className={wire} markerStart="url(#soc-arrow)" markerEnd="url(#soc-arrow)" />
+      <text x="132" y="90" className={subText}>memory-mapped</text>
+      <text x="132" y="102" className={subText}>registers</text>
+      <rect x="102" y="112" width="154" height="62" rx="6" className={accentBox} />
+      <text x="179" y="133" textAnchor="middle" className={mainText}>CNN accelerator</text>
+      <text x="179" y="149" textAnchor="middle" className={subText}>Verilog pipeline · INT8</text>
+      <text x="179" y="163" textAnchor="middle" className={subText}>33.7k parameters</text>
+
+      {[{ y: 35, label: "Class" }, { y: 80, label: "Box" }, { y: 125, label: "Depth" }].map(({ y, label }) => (
+        <g key={label}>
+          <line x1="270" y1="95" x2="288" y2={y + 15} className={wire} markerEnd="url(#soc-arrow)" />
+          <rect x="290" y={y} width="68" height="30" rx="6" className={box} />
+          <text x="324" y={y + 19} textAnchor="middle" className={mainText}>{label}</text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+function VerificationDiagram() {
+  const stages = [
+    { x: 1, title: "PyTorch", sub: "QAT model" },
+    { x: 127, title: "C simulation", sub: "reference model" },
+    { x: 253, title: "RTL testbench", sub: "Verilog" },
+  ];
+  return (
+    <svg viewBox="0 0 360 180" className="w-full h-auto" role="img" aria-label="A single source of truth feeds the PyTorch QAT model, the C simulation model and the RTL testbench, whose integer outputs are checked to be bit-identical">
+      <defs><ArrowMarker id="ver-arrow" /></defs>
+      <rect x="1" y="4" width="358" height="34" rx="8" className={accentBox} />
+      <text x="180" y="25" textAnchor="middle" className={mainText}>Single source of truth</text>
+      {stages.map(({ x, title, sub }) => (
+        <g key={title}>
+          <line x1={x + 53} y1="38" x2={x + 53} y2="70" className={wire} markerEnd="url(#ver-arrow)" />
+          <rect x={x} y="72" width="106" height="54" rx="6" className={box} />
+          <text x={x + 53} y="95" textAnchor="middle" className={mainText}>{title}</text>
+          <text x={x + 53} y="111" textAnchor="middle" className={subText}>{sub}</text>
+        </g>
+      ))}
+      {[117, 243].map((cx) => (
+        <g key={cx}>
+          <circle cx={cx} cy="99" r="9" className={accentBox} />
+          <text x={cx} y="103" textAnchor="middle" className="fill-green-700 dark:fill-green-300 text-[12px] font-bold">=</text>
+        </g>
+      ))}
+      <path d="M54,136 V146 H306 V136 M180,146 V152" fill="none" className="stroke-green-500 dark:stroke-green-600" />
+      <text x="180" y="170" textAnchor="middle" className="fill-green-700 dark:fill-green-400 text-[12px] font-semibold">Bit-identical integer outputs</text>
+    </svg>
+  );
+}
+
+const diagrams = { soc: SocDiagram, verification: VerificationDiagram };
+
+function ProjectFigures({ figures }: { figures: Figure[] }) {
+  return (
+    <div className="grid md:grid-cols-2 gap-4">
+      {figures.map(({ diagram, title, caption }) => {
+        const Diagram = diagrams[diagram];
+        return (
+          <figure key={title} className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 p-4 transition-colors">
+            <h5 className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">{title}</h5>
+            <Diagram />
+            <figcaption className="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">{caption}</figcaption>
+          </figure>
+        );
+      })}
+    </div>
+  );
+}
+
 function ProjectMedia({ media, onOpen }: { media: Media[]; onOpen: (m: Media) => void }) {
   return (
     // Phones: a swipeable strip. Desktop: one row where each item's width follows its aspect ratio, so heights match.
@@ -309,7 +429,7 @@ function ProjectMedia({ media, onOpen }: { media: Media[]; onOpen: (m: Media) =>
           type="button"
           onClick={() => onOpen(m)}
           aria-label={`Enlarge: ${m.alt}`}
-          className="group relative shrink-0 h-44 md:h-auto md:shrink md:basis-0 snap-start overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-green-500"
+          className={`group relative shrink-0 h-44 md:h-auto md:shrink md:basis-0 snap-start overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-green-500 ${m.round ? 'rounded-full self-center' : 'rounded-xl'}`}
           style={{ aspectRatio: `${m.width} / ${m.height}`, flexGrow: m.width / m.height }}
         >
           {m.type === "video" ? (
@@ -667,7 +787,8 @@ export default function Portfolio() {
       </header>
 
       {/* Hero Section */}
-      <section ref={headerRef} className="pt-32 pb-12 md:pb-20 px-6 max-w-5xl mx-auto md:min-h-[80vh] flex flex-col justify-center">
+      {/* Fills the screen so About starts below the fold */}
+      <section ref={headerRef} className="relative pt-24 pb-28 px-6 max-w-5xl mx-auto min-h-svh flex flex-col justify-center">
         <div className="hero-anim opacity-0 mb-6 flex flex-col gap-3 lg:flex-row lg:items-baseline lg:gap-4">
             <span className="whitespace-nowrap text-5xl md:text-7xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">Hi, I&apos;m</span>
             {/* viewBox fits the capitals at 96px with the baseline at y=0, so the name scales to the screen width */}
@@ -699,6 +820,12 @@ export default function Portfolio() {
                 LinkedIn
              </a>
           )}
+        </div>
+        <div className="absolute inset-x-0 bottom-8 flex justify-center">
+          <a href="#about" onClick={(e) => handleScroll(e, 'about')} className="hero-anim opacity-0 flex flex-col items-center gap-1 text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+            Scroll for more
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="motion-safe:animate-bounce"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+          </a>
         </div>
       </section>
 
@@ -759,7 +886,7 @@ export default function Portfolio() {
         <h3 className="text-3xl font-bold mb-12 border-l-4 border-green-600 dark:border-green-500 pl-4 text-neutral-900 dark:text-white">Projects</h3>
         <div className="space-y-6">
           {featuredProjects.map((project) => (
-            <div key={project.name} className="project-card opacity-0 relative overflow-hidden bg-white dark:bg-neutral-900 p-6 md:p-8 rounded-2xl shadow-md border border-neutral-200 dark:border-neutral-800 hover:border-green-300 dark:hover:border-green-800 transition-colors md:grid md:grid-cols-5 md:grid-rows-[auto_1fr_auto] md:gap-x-8">
+            <div key={project.name} id={project.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="project-card opacity-0 relative overflow-hidden bg-white dark:bg-neutral-900 p-6 md:p-8 rounded-2xl shadow-md border border-neutral-200 dark:border-neutral-800 hover:border-green-300 dark:hover:border-green-800 transition-colors md:grid md:grid-cols-5 md:grid-rows-[auto_1fr_auto] md:gap-x-8">
               <div className="absolute inset-y-0 left-0 w-1 bg-green-600 dark:bg-green-500" aria-hidden="true" />
               <div className="md:col-span-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">{project.date}</span>
@@ -779,6 +906,11 @@ export default function Portfolio() {
               {project.media && (
                 <div className="md:col-span-5 md:row-start-3 mt-6">
                   <ProjectMedia media={project.media} onOpen={setLightbox} />
+                </div>
+              )}
+              {project.figures && (
+                <div className="md:col-span-5 md:row-start-3 mt-6">
+                  <ProjectFigures figures={project.figures} />
                 </div>
               )}
             </div>
@@ -836,9 +968,15 @@ export default function Portfolio() {
                         <p className="text-green-600 dark:text-green-400 text-sm font-semibold mt-1">{edu.honours}</p>
                     )}
                     <div className="mt-4 space-y-2">
-                        {edu.details.map((d, i) => (
+                        {edu.details.map(({ label, text, link }, i) => (
                             <p key={i} className="text-neutral-600 dark:text-neutral-400 text-sm">
-                                <span className="font-semibold text-neutral-700 dark:text-neutral-300">{d.label}:</span> {d.text}
+                                <span className="font-semibold text-neutral-700 dark:text-neutral-300">{label}:</span> {text}
+                                {link && (
+                                    <>
+                                        {' '}
+                                        <a href={`#${link.id}`} onClick={(e) => handleScroll(e, link.id)} className="whitespace-nowrap font-semibold text-green-600 dark:text-green-400 hover:underline">{link.label} &darr;</a>
+                                    </>
+                                )}
                             </p>
                         ))}
                     </div>
@@ -965,7 +1103,7 @@ export default function Portfolio() {
               height={lightbox.height}
               unoptimized
               onClick={(e) => e.stopPropagation()}
-              className="max-h-[80vh] w-auto h-auto max-w-full rounded-lg"
+              className={`max-h-[80vh] w-auto h-auto max-w-full ${lightbox.round ? 'rounded-full' : 'rounded-lg'}`}
             />
           )}
           <p className="max-w-2xl text-center text-sm text-neutral-300">{lightbox.alt}</p>
