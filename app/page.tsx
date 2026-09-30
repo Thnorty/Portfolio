@@ -170,6 +170,28 @@ const cvData = {
       ],
     },
     {
+      name: "TinyKITTINet",
+      subtitle: "Hardware-Accelerated Multi-Task CNN",
+      date: "2026",
+      featured: true,
+      award: "MSc Thesis · Dublin City University",
+      description:
+        "My MSc thesis: a 33.7k-parameter INT8 CNN for road perception on KITTI that predicts class, bounding box and depth, running on a dedicated Verilog accelerator in a PicoRV32 soft-core SoC. It takes 4–6× fewer cycles than out-of-order x86 and RISC-V baselines in gem5.",
+      tech: ["Verilog", "RISC-V", "gem5", "PyTorch"],
+      figures: [
+        { diagram: "soc", title: "System", caption: "The PicoRV32 core drives the dedicated Verilog CNN accelerator through memory-mapped registers, and the SoC returns all three task outputs." },
+        { diagram: "verification", title: "Verification", caption: "The PyTorch QAT model, the C reference model and the RTL testbench share one source of truth, and the harness checks that their integer outputs are bit-identical." },
+      ],
+    },
+    {
+      name: "Vision-Language-Action Models",
+      subtitle: "Robotic Manipulation Research",
+      date: "2026 – Present",
+      description:
+        "Fine-tuning and evaluating OpenVLA and OpenVLA-OFT policies on long-horizon tasks like cooking and dishwashing, and studying modality bias: how visual attention decays across generated action sequences. Also extended the stable-worldmodel harness with a GRU-based world model, benchmarked on MuJoCo cube manipulation.",
+      tech: ["OpenVLA", "PyTorch", "MuJoCo"],
+    },
+    {
       name: "Cairn",
       subtitle: "AI-Verified Habit Tracker",
       date: "2026",
@@ -196,6 +218,51 @@ const cvData = {
       links: [{ label: "GitHub", href: "https://github.com/Thnorty/RSVPro" }],
     },
     {
+      name: "eBPF/XDP DDoS Mitigation",
+      date: "2026",
+      description:
+        "XDP program in C, loaded through BCC from Python, that drops fragmented ICMP floods at the driver before the kernel network stack allocates for them. Benchmarked against a Netfilter implementation under a Ping of Death style attack, and deployed on a Raspberry Pi.",
+      tech: ["C", "eBPF", "XDP", "BCC", "Python", "Linux kernel"],
+    },
+    {
+      name: "3D Gaussian Splatting",
+      subtitle: "Reconstruction Pipeline",
+      date: "2026",
+      description:
+        "End-to-end scene reconstruction: structure-from-motion with COLMAP and GLOMAP on captured image sets, then Gaussian Splatting training and rendering with gsplat and Splatfacto, using Gaussian Grouping for object-level segmentation.",
+      tech: ["COLMAP", "GLOMAP", "gsplat", "Splatfacto", "viser"],
+    },
+    {
+      name: "Browser Extensions & Games",
+      date: "2023 – 2026",
+      description:
+        "Published Chrome extensions, including a YouTube video summariser and an AI-detector analysis tool, and 2D games in Unity and Godot: Nine Bowls (a cat puzzle), Re Boot Repair Shop and SlotMatch.",
+      tech: ["JavaScript", "Unity", "Godot", "C#"],
+    },
+    {
+      name: "SensoryPod",
+      subtitle: "IoT Companion App",
+      date: "2025",
+      description:
+        "Flutter control app for sensory IoT hardware: music and ambient sound playback, smart lighting scenes and sensor-driven motion control, from one codebase across iOS, Android, Web, Windows, macOS and Linux.",
+      tech: ["Flutter", "Dart", "IoT"],
+    },
+    {
+      name: "AI Mood Detector",
+      date: "2025",
+      description:
+        "Full-stack web app that recognises facial emotions in uploaded images, then generates personalised responses through the Gemini API. Built with React 19, Vite, Tailwind and Framer Motion on a Python deep-learning backend.",
+      tech: ["React 19", "Vite", "Tailwind", "Deep Learning", "Gemini API"],
+    },
+    {
+      name: "ThalAI",
+      subtitle: "Multimodal Cartoon Episode Engine",
+      date: "2024 – 2025",
+      description:
+        "My undergraduate graduation project: a platform that generates complete audiovisual episodes of an animated series. Fine-tuned LLMs write scripts, scene breakdowns and dialogue, served by separate Django, LLM inference, text-to-speech and React Native services.",
+      tech: ["Django", "React Native", "Docker", "Generative AI"],
+    },
+    {
       name: "ETUPedia",
       date: "2024",
       description:
@@ -207,59 +274,6 @@ const cvData = {
       ],
     },
     {
-      name: "TinyKITTINet",
-      subtitle: "Hardware-Accelerated Multi-Task CNN",
-      date: "2026",
-      featured: true,
-      award: "MSc Thesis · Dublin City University",
-      description:
-        "My MSc thesis: a 33.7k-parameter INT8 CNN for road perception on KITTI that predicts class, bounding box and depth, running on a dedicated Verilog accelerator in a PicoRV32 soft-core SoC. It takes 4–6× fewer cycles than out-of-order x86 and RISC-V baselines in gem5.",
-      tech: ["Verilog", "RISC-V", "gem5", "PyTorch"],
-      figures: [
-        { diagram: "soc", title: "System", caption: "The PicoRV32 core drives the dedicated Verilog CNN accelerator through memory-mapped registers, and the SoC returns all three task outputs." },
-        { diagram: "verification", title: "Verification", caption: "The PyTorch QAT model, the C reference model and the RTL testbench share one source of truth, and the harness checks that their integer outputs are bit-identical." },
-      ],
-    },
-    {
-      name: "eBPF/XDP DDoS Mitigation",
-      date: "2026",
-      description:
-        "XDP program in C, loaded through BCC from Python, that drops fragmented ICMP floods at the driver before the kernel network stack allocates for them. Benchmarked against a Netfilter implementation under a Ping of Death style attack, and deployed on a Raspberry Pi.",
-      tech: ["C", "eBPF", "XDP", "BCC", "Python", "Linux kernel"],
-    },
-    {
-      name: "Vision-Language-Action Models",
-      subtitle: "Robotic Manipulation Research",
-      date: "2026 – Present",
-      description:
-        "Fine-tuning and evaluating OpenVLA and OpenVLA-OFT policies on long-horizon tasks like cooking and dishwashing, and studying modality bias: how visual attention decays across generated action sequences. Also extended the stable-worldmodel harness with a GRU-based world model, benchmarked on MuJoCo cube manipulation.",
-      tech: ["OpenVLA", "PyTorch", "MuJoCo"],
-    },
-    {
-      name: "3D Gaussian Splatting",
-      subtitle: "Reconstruction Pipeline",
-      date: "2026",
-      description:
-        "End-to-end scene reconstruction: structure-from-motion with COLMAP and GLOMAP on captured image sets, then Gaussian Splatting training and rendering with gsplat and Splatfacto, using Gaussian Grouping for object-level segmentation.",
-      tech: ["COLMAP", "GLOMAP", "gsplat", "Splatfacto", "viser"],
-    },
-    {
-      name: "ThalAI",
-      subtitle: "Multimodal Cartoon Episode Engine",
-      date: "2024 – 2025",
-      description:
-        "My undergraduate graduation project: a platform that generates complete audiovisual episodes of an animated series. Fine-tuned LLMs write scripts, scene breakdowns and dialogue, served by separate Django, LLM inference, text-to-speech and React Native services.",
-      tech: ["Django", "React Native", "Docker", "Generative AI"],
-    },
-    {
-      name: "SensoryPod",
-      subtitle: "IoT Companion App",
-      date: "2025",
-      description:
-        "Flutter control app for sensory IoT hardware: music and ambient sound playback, smart lighting scenes and sensor-driven motion control, from one codebase across iOS, Android, Web, Windows, macOS and Linux.",
-      tech: ["Flutter", "Dart", "IoT"],
-    },
-    {
       name: "Yanındayım",
       subtitle: "Elder-Care Emergency Assistant",
       date: "2024",
@@ -268,20 +282,6 @@ const cvData = {
         "Placed 2nd out of 30+ teams at MobileAction’s 24-hour hackathon. Background accelerometer-based fall detection automatically alerts emergency contacts.",
       tech: ["React Native", "Gemini API"],
       links: [{ label: "GitHub", href: "https://github.com/Thnorty/MobileActionHackathor-frontend" }],
-    },
-    {
-      name: "AI Mood Detector",
-      date: "2025",
-      description:
-        "Full-stack web app that recognises facial emotions in uploaded images, then generates personalised responses through the Gemini API. Built with React 19, Vite, Tailwind and Framer Motion on a Python deep-learning backend.",
-      tech: ["React 19", "Vite", "Tailwind", "Deep Learning", "Gemini API"],
-    },
-    {
-      name: "Browser Extensions & Games",
-      date: "2023 – 2026",
-      description:
-        "Published Chrome extensions, including a YouTube video summariser and an AI-detector analysis tool, and 2D games in Unity and Godot: Nine Bowls (a cat puzzle), Re Boot Repair Shop and SlotMatch.",
-      tech: ["JavaScript", "Unity", "Godot", "C#"],
     },
   ] as Project[],
   skills: [
