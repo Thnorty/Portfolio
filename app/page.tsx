@@ -5,24 +5,26 @@ import Link from "next/link";
 import { animate, stagger, createTimeline, svg, type JSAnimation } from "animejs";
 
 // CV Data
-type Link = { label: string; href: string };
+type ExternalLink = { label: string; href: string };
 
 type Project = {
   name: string;
   subtitle?: string;
   date: string;
   award?: string;
+  featured?: boolean;
   description: string;
   tech: string[];
-  links?: Link[];
+  links?: ExternalLink[];
 };
 
 const cvData = {
   personal: {
     name: "OGUZ NURLU",
-    title: "Software engineer based in Dublin",
-    location: "Dublin, Ireland",
+    title: "Software engineer based in Ankara, Türkiye",
+    location: "Ankara, Türkiye",
     email: "nurluoguz03@gmail.com",
+    cv: "/Oguz_Nurlu_CV.pdf",
     linkedin: "https://linkedin.com/in/oguz-nurlu",
     github: "https://github.com/Thnorty",
     summary:
@@ -116,9 +118,10 @@ const cvData = {
     {
       name: "Field-Report-Assisted Risk Agent",
       date: "2026",
+      featured: true,
       award: "National Hackathon 2nd Place · ROKETSAN AI Award",
       description:
-        "Captained a 6-person team at ROKETSAN Level Up AI, a 48-hour national hackathon for 72 engineers selected from ~2,500 applicants. Fused RF-DETR and YOLO with TTA and a WBF ensemble for aerial vehicle detection (0.863 val mAP50), then built an LLM agent that weighs drone detections, vehicle tracks and possibly misleading field reports, with a deterministic core enforcing 8 code-level guardrails. Also shipped a 15-tool chat agent and Karargah Gözü, a Flutter app with live replay, push alerts and Turkish voice questions.",
+        "Captained a 6-person team at ROKETSAN Level Up AI, a 48-hour national hackathon for 72 engineers selected from ~2,500 applicants. Fused RF-DETR and YOLO in a WBF ensemble for aerial vehicle detection (0.863 val mAP50), then built an LLM agent that weighs drone detections, vehicle tracks and possibly misleading field reports, backed by a deterministic core with 8 code-level guardrails. Also shipped Karargah Gözü, a Flutter app with live replay, push alerts and Turkish voice questions.",
       tech: ["RF-DETR", "YOLO", "LLM Agents", "Python", "Flutter", "Firebase"],
       links: [{ label: "GitHub", href: "https://github.com/Thnorty/RoketsanLevelUp" }],
     },
@@ -126,6 +129,7 @@ const cvData = {
       name: "RepForth",
       subtitle: "Exercise Planner & Tracker",
       date: "2026",
+      featured: true,
       description:
         "Local-first Android training app with a Wear OS companion, released at v1.0.2. A multi-module Gradle project with baseline profiles, a catalogue of 1,324 animated exercises, and full English and Turkish support. No account, no backend and no telemetry.",
       tech: ["Kotlin", "Android", "Wear OS", "Gradle"],
@@ -172,6 +176,7 @@ const cvData = {
       name: "TinyKITTINet",
       subtitle: "Hardware-Accelerated Multi-Task CNN",
       date: "2026",
+      featured: true,
       description:
         "33.7k-parameter INT8 CNN for road perception on KITTI (classification, bounding box and depth), running on a dedicated Verilog accelerator in a PicoRV32 soft-core SoC. 4–6× fewer cycles than out-of-order x86/RISC-V baselines in gem5, with bit-identical integer results verified from PyTorch QAT through C models to RTL testbenches.",
       tech: ["Verilog", "RISC-V", "gem5", "PyTorch"],
@@ -241,41 +246,54 @@ const cvData = {
     },
   ] as Project[],
   skills: [
-    {
-      category: "Languages",
-      items: ["Python", "JavaScript", "TypeScript", "Dart", "Kotlin", "Java", "C", "C++", "C#", "SQL", "Verilog", "Bash"],
-    },
-    {
-      category: "Web & Mobile",
-      items: ["React", "React Native", "Expo", "Flutter", "Django REST Framework", "FastAPI", "REST API design", "Server-Sent Events", "Firebase Cloud Messaging", "Tailwind", "NativeWind", "styled-components", "Zustand", "Riverpod", "i18next"],
-    },
-    {
-      category: "Databases",
-      items: ["PostgreSQL", "MySQL", "SQLite", "Drift", "Supabase", "Elasticsearch", "Relational modelling", "Query & index optimisation"],
-    },
-    {
-      category: "Cloud & Infrastructure",
-      items: ["AWS (S3, Lambda)", "Kubernetes", "Docker", "Nginx", "Linux (Ubuntu, Arch)", "SLURM/HPC", "Gradle"],
-    },
-    {
-      category: "AI & Machine Learning",
-      items: ["PyTorch", "Hugging Face", "LLM fine-tuning", "Tool-calling LLM agents", "MCP agent tooling", "Vision-Language-Action models", "Computer Vision", "YOLO", "RF-DETR", "WBF ensembles", "Quantisation-Aware Training", "3D Gaussian Splatting", "MuJoCo"],
-    },
-    {
-      category: "Systems & Low Level",
-      items: ["Linux kernel networking", "eBPF/XDP", "Netfilter", "RISC-V (RV32/RV64, PicoRV32)", "Soft-core SoC bring-up", "gem5", "Verilog", "Vivado"],
-    },
-    {
-      category: "Engineering Practice",
-      items: ["Git", "Code review", "Automated regression harnesses", "CI workflows", "Agile teams", "Open-source releases"],
-    },
-    {
-      category: "Game Development",
-      items: ["Unity", "Godot"],
-    },
+    { category: "Languages", items: ["Python", "TypeScript", "JavaScript", "Kotlin", "Dart", "C"] },
+    { category: "Web & Mobile", items: ["React", "React Native", "Flutter", "Django REST Framework", "FastAPI"] },
+    { category: "Data & Infrastructure", items: ["PostgreSQL", "Supabase", "Elasticsearch", "Docker", "Kubernetes", "AWS", "Linux"] },
+    { category: "AI & Machine Learning", items: ["PyTorch", "Hugging Face", "Tool-calling LLM agents", "Object detection (YOLO, RF-DETR)", "Vision-Language-Action models"] },
+    { category: "Systems & Hardware", items: ["eBPF/XDP", "RISC-V", "Verilog", "gem5"] },
   ],
   spokenLanguages: ["English (Fluent · TOEFL 97, IELTS 7.0)", "Turkish (Native)", "German (A2)"],
 };
+
+const featuredProjects = cvData.projects.filter((p) => p.featured);
+const otherProjects = cvData.projects.filter((p) => !p.featured);
+
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const scrollBehavior = (): ScrollBehavior => (prefersReducedMotion() ? 'auto' : 'smooth');
+
+function TechTags({ tech }: { tech: string[] }) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {tech.map((t) => (
+        <span key={t} className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-md text-xs font-medium transition-colors">{t}</span>
+      ))}
+    </div>
+  );
+}
+
+function ProjectLinks({ links }: { links: ExternalLink[] }) {
+  return (
+    <div className="flex gap-4 mt-4">
+      {links.map((link) => (
+        <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="text-green-600 dark:text-green-400 text-sm font-semibold hover:underline">
+          {link.label} &rarr;
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function AwardBadge({ award }: { award: string }) {
+  return (
+    <div className="flex flex-wrap gap-2 mt-3">
+      {award.split(" · ").map((a) => (
+        <span key={a} className="px-2.5 py-1 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-900 rounded-full text-xs font-semibold transition-colors">
+          {a}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 const navItems = [
   { id: 'about', label: 'About' },
@@ -308,6 +326,7 @@ export default function Portfolio() {
   const isDarkMode = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, () => null);
   const mounted = isDarkMode !== null;
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showAllProjects, setShowAllProjects] = useState(false);
 
   const toggleTheme = () => {
     if (isDarkMode) {
@@ -321,7 +340,7 @@ export default function Portfolio() {
 
   const handleHover = (e: React.MouseEvent<HTMLElement>) => {
     // Touch devices fire mouseenter on tap, which would leave the card scaled past the screen edge
-    if (!window.matchMedia('(hover: hover)').matches) return;
+    if (!window.matchMedia('(hover: hover)').matches || prefersReducedMotion()) return;
     animate(e.currentTarget, {
       scale: 1.05,
       duration: 300,
@@ -368,12 +387,24 @@ export default function Portfolio() {
     
         window.scrollTo({
             top: offsetPosition,
-            behavior: "smooth"
+            behavior: scrollBehavior()
         });
     }
   };
 
   useEffect(() => {
+    const sectionRefs = [aboutRef, expRef, projectsRef, skillsRef, eduRef, contactRef];
+
+    // Reduced motion: show everything as-is, with no entrance, scroll, parallax or signature animations
+    if (prefersReducedMotion()) {
+        headerRef.current?.querySelectorAll<HTMLElement>('.hero-anim').forEach((el) => { el.style.opacity = '1'; });
+        sectionRefs.forEach((ref) => {
+            ref.current?.classList.remove('opacity-0');
+            ref.current?.querySelectorAll<HTMLElement>('.opacity-0').forEach((el) => { el.style.opacity = '1'; });
+        });
+        return;
+    }
+
     // Initial Hero Animation
     if (headerRef.current) {
         animate(headerRef.current.querySelectorAll('.hero-anim'), {
@@ -463,6 +494,7 @@ export default function Portfolio() {
     };
 
     window.addEventListener('scroll', onScroll);
+    window.addEventListener('resize', onScroll);
     onScroll(); // Initial check
 
     // Signature Animation
@@ -486,20 +518,27 @@ export default function Portfolio() {
 
     return () => {
         window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onScroll);
     };
   }, []);
+
+  // Showing or hiding projects moves everything below, so re-sync the scroll animations
+  useEffect(() => {
+    window.dispatchEvent(new Event('resize'));
+  }, [showAllProjects]);
 
   return (
     <main className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 overflow-hidden font-sans transition-colors duration-300">
       {/* Navigation / Header */}
       <header className="fixed top-0 w-full bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md z-50 border-b border-neutral-200 dark:border-neutral-800 transition-colors duration-300">
         <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="font-bold text-xl tracking-tighter text-neutral-900 dark:text-white cursor-pointer hover:text-green-600 dark:hover:text-green-400 transition-colors">ON.</Link>
+          <Link href="/" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: scrollBehavior() }); }} className="font-bold text-xl tracking-tighter text-neutral-900 dark:text-white cursor-pointer hover:text-green-600 dark:hover:text-green-400 transition-colors">ON.</Link>
           <div className="flex items-center gap-3 md:gap-6">
             <nav className="hidden md:flex gap-6 text-sm font-medium">
                 {navItems.map(({ id, label }) => (
                     <a key={id} href={`#${id}`} onClick={(e) => handleScroll(e, id)} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-neutral-700 dark:text-neutral-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">{label}</a>
                 ))}
+                <a href={cvData.personal.cv} download onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-green-600 dark:text-green-400 font-semibold hover:text-green-700 dark:hover:text-green-300 transition-colors">CV</a>
             </nav>
             <button 
                 onClick={toggleTheme} 
@@ -534,6 +573,7 @@ export default function Portfolio() {
                 {navItems.map(({ id, label }) => (
                     <a key={id} href={`#${id}`} onClick={(e) => handleScroll(e, id)} className="block py-3 text-base font-medium text-neutral-700 dark:text-neutral-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">{label}</a>
                 ))}
+                <a href={cvData.personal.cv} download onClick={() => setMenuOpen(false)} className="block py-3 text-base font-semibold text-green-600 dark:text-green-400">Download CV</a>
             </nav>
         )}
       </header>
@@ -561,6 +601,10 @@ export default function Portfolio() {
           </a>
           <a href={cvData.personal.github} target="_blank" onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="whitespace-nowrap px-6 md:px-8 py-3 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-white border border-neutral-200 dark:border-neutral-700 font-semibold rounded-full hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">
             GitHub
+          </a>
+          <a href={cvData.personal.cv} download onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="whitespace-nowrap inline-flex items-center gap-2 px-6 md:px-8 py-3 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-white border border-neutral-200 dark:border-neutral-700 font-semibold rounded-full hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            Download CV
           </a>
           {cvData.personal.linkedin && (
              <a href={cvData.personal.linkedin} target="_blank" onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="whitespace-nowrap px-6 md:px-8 py-3 bg-white dark:bg-neutral-800 text-green-700 dark:text-green-400 border border-neutral-200 dark:border-neutral-700 font-semibold rounded-full hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">
@@ -625,44 +669,64 @@ export default function Portfolio() {
       {/* Projects Section */}
       <section id="projects" ref={projectsRef} className="py-20 px-6 max-w-5xl mx-auto opacity-0 transition-opacity duration-500">
         <h3 className="text-3xl font-bold mb-12 border-l-4 border-green-600 dark:border-green-500 pl-4 text-neutral-900 dark:text-white">Projects</h3>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {cvData.projects.map((project, idx) => (
-            <div key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="project-card opacity-0 bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-md border border-neutral-100 dark:border-neutral-800 flex flex-col justify-between transition-colors">
+        <div className="space-y-6">
+          {featuredProjects.map((project) => (
+            <div key={project.name} className="project-card opacity-0 relative overflow-hidden bg-white dark:bg-neutral-900 p-6 md:p-8 rounded-2xl shadow-md border border-neutral-200 dark:border-neutral-800 hover:border-green-300 dark:hover:border-green-800 transition-colors md:grid md:grid-cols-5 md:grid-rows-[auto_1fr] md:gap-x-8">
+              <div className="absolute inset-y-0 left-0 w-1 bg-green-600 dark:bg-green-500" aria-hidden="true" />
+              <div className="md:col-span-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">{project.date}</span>
+                <h4 className="text-2xl font-bold mt-1 text-neutral-900 dark:text-white">{project.name}</h4>
+                {project.subtitle && (
+                  <p className="text-green-600 dark:text-green-400 font-medium mt-1">{project.subtitle}</p>
+                )}
+                {project.award && <AwardBadge award={project.award} />}
+              </div>
+              <p className="md:col-span-3 md:col-start-3 md:row-span-2 md:row-start-1 mt-4 md:mt-0 text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                {project.description}
+              </p>
+              <div className="md:col-span-2 md:col-start-1 md:row-start-2 mt-5">
+                <TechTags tech={project.tech} />
+                {project.links && <ProjectLinks links={project.links} />}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <h4 id="more-projects" className="scroll-mt-24 text-lg font-semibold mt-16 mb-6 text-neutral-900 dark:text-white">More projects</h4>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {otherProjects.map((project, idx) => (
+            <div key={project.name} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className={`project-card opacity-0 bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-md border border-neutral-100 dark:border-neutral-800 flex-col justify-between transition-colors ${showAllProjects || idx < 3 ? 'flex' : idx < 6 ? 'hidden md:flex' : 'hidden'}`}>
               <div>
-                <div className="flex items-baseline justify-between gap-3">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-3">
                   <h4 className="text-xl font-bold text-neutral-900 dark:text-white">{project.name}</h4>
                   <span className="shrink-0 text-xs font-semibold text-neutral-500 dark:text-neutral-400">{project.date}</span>
                 </div>
                 {project.subtitle && (
                   <p className="text-green-600 dark:text-green-400 text-sm font-medium mt-1">{project.subtitle}</p>
                 )}
-                {project.award && (
-                  <span className="inline-block mt-3 px-2.5 py-1 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-900 rounded-full text-xs font-semibold transition-colors">
-                    {project.award}
-                  </span>
-                )}
+                {project.award && <AwardBadge award={project.award} />}
                 <p className="text-neutral-600 dark:text-neutral-400 mt-3 mb-5 text-sm leading-relaxed">
                   {project.description}
                 </p>
               </div>
               <div className="mt-auto">
-                <div className="flex flex-wrap gap-1.5">
-                  {project.tech.map((t) => (
-                    <span key={t} className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-md text-xs font-medium transition-colors">{t}</span>
-                  ))}
-                </div>
-                {project.links && (
-                  <div className="flex gap-4 mt-4">
-                    {project.links.map((link) => (
-                      <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="text-green-600 dark:text-green-400 text-sm font-semibold hover:underline">
-                        {link.label} &rarr;
-                      </a>
-                    ))}
-                  </div>
-                )}
+                <TechTags tech={project.tech} />
+                {project.links && <ProjectLinks links={project.links} />}
               </div>
             </div>
           ))}
+        </div>
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => {
+              if (showAllProjects) document.getElementById('more-projects')?.scrollIntoView({ behavior: scrollBehavior() });
+              setShowAllProjects(!showAllProjects);
+            }}
+            aria-expanded={showAllProjects}
+            className="px-6 py-3 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-white border border-neutral-200 dark:border-neutral-700 font-semibold rounded-full hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
+          >
+            {showAllProjects ? 'Show fewer projects' : `Show all ${cvData.projects.length} projects`}
+          </button>
         </div>
       </section>
 
@@ -699,6 +763,7 @@ export default function Portfolio() {
       <section id="skills" ref={skillsRef} className="py-20 px-6 max-w-5xl mx-auto opacity-0 transition-opacity duration-500">
         <h3 className="text-3xl font-bold mb-12 border-l-4 border-green-600 dark:border-green-500 pl-4 text-neutral-900 dark:text-white">Skills</h3>
         
+        <div className="grid md:grid-cols-2 gap-x-12">
         {cvData.skills.map((group) => (
             <div key={group.category} className="mb-8">
                 <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">{group.category}</h4>
@@ -711,8 +776,7 @@ export default function Portfolio() {
                 </div>
             </div>
         ))}
-
-        <div>
+        <div className="mb-8">
             <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Spoken Languages</h4>
             <div className="flex flex-wrap gap-2">
                 {cvData.spokenLanguages.map((lang, idx) => (
@@ -721,6 +785,7 @@ export default function Portfolio() {
                     </span>
                 ))}
             </div>
+        </div>
         </div>
       </section>
 

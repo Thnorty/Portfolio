@@ -18,9 +18,27 @@ const anta = Anta({
   weight: "400"
 });
 
+const title = "Oguz Nurlu | Portfolio";
+const description = "Portfolio of Oguz Nurlu, an Ankara-based software engineer working across full-stack and mobile development, AI agents and computer vision, and hardware-accelerated machine learning.";
+
 export const metadata: Metadata = {
-  title: "Oguz Nurlu | Portfolio",
-  description: "Portfolio of Oguz Nurlu, a Dublin-based software engineer working across full-stack and mobile development, AI agents and computer vision, and hardware-accelerated machine learning.",
+  metadataBase: new URL("https://oguznurlu.com"),
+  title,
+  description,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title,
+    description,
+    url: "/",
+    siteName: "Oguz Nurlu",
+    locale: "en_GB",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export default function RootLayout({
