@@ -1,11 +1,21 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { animate, stagger, createTimeline, svg, type JSAnimation } from "animejs";
 
 // CV Data
 type ExternalLink = { label: string; href: string };
+
+type Media = {
+  type: "image" | "video";
+  src: string;
+  poster?: string;
+  alt: string;
+  width: number;
+  height: number;
+};
 
 type Project = {
   name: string;
@@ -16,6 +26,7 @@ type Project = {
   description: string;
   tech: string[];
   links?: ExternalLink[];
+  media?: Media[];
 };
 
 const cvData = {
@@ -121,9 +132,14 @@ const cvData = {
       featured: true,
       award: "National Hackathon 2nd Place · ROKETSAN AI Award",
       description:
-        "Captained a 6-person team at ROKETSAN Level Up AI, a 48-hour national hackathon for 72 engineers selected from ~2,500 applicants. Fused RF-DETR and YOLO in a WBF ensemble for aerial vehicle detection (0.863 val mAP50), then built an LLM agent that weighs drone detections, vehicle tracks and possibly misleading field reports, backed by a deterministic core with 8 code-level guardrails. Also shipped Karargah Gözü, a Flutter app with live replay, push alerts and Turkish voice questions.",
-      tech: ["RF-DETR", "YOLO", "LLM Agents", "Python", "Flutter", "Firebase"],
-      links: [{ label: "GitHub", href: "https://github.com/Thnorty/RoketsanLevelUp" }],
+        "Captained a 6-person team at ROKETSAN Level Up AI, a 48-hour national hackathon for 72 engineers selected from ~2,500 applicants. Built the LLM agent pipeline, which weighs drone detections, vehicle tracks and possibly misleading field reports behind a deterministic core with 8 code-level guardrails, and Karargah Gözü, a Flutter app with live replay, push alerts and Turkish voice questions. For detection, selected and tested the models and augmentations behind a 4-model RF-DETR + YOLO ensemble (0.863 val mAP50, 0.809 Kaggle public). The same engine also drives the team's ROS 2 + Unity digital twin.",
+      tech: ["RF-DETR", "YOLO", "LLM Agents", "Python", "Flutter", "Firebase", "ROS 2", "Unity"],
+      media: [
+        { type: "video", src: "/projects/karargah/digital-twin.mp4", poster: "/projects/karargah/digital-twin-poster.webp", alt: "Unity digital twin: the camera dives onto tracked vehicles, ringed by the agent's risk decision", width: 1280, height: 800 },
+        { type: "image", src: "/projects/karargah/detections.webp", alt: "Drone frame with detected vehicles labelled by the LLM's risk decision; V3 was raised from LOW to MEDIUM", width: 1280, height: 720 },
+        { type: "image", src: "/projects/karargah/app-feed.webp", alt: "Karargah Gözü app: live replay of the day with critical and high-risk alerts (Turkish UI)", width: 1060, height: 1310 },
+        { type: "image", src: "/projects/karargah/app-chat.webp", alt: "Karargah Gözü app: asking the agent whether anything was dangerous between 14:00 and 15:00 (Turkish UI)", width: 1080, height: 1478 },
+      ],
     },
     {
       name: "RepForth",
@@ -283,6 +299,42 @@ function ProjectLinks({ links }: { links: ExternalLink[] }) {
   );
 }
 
+function ProjectMedia({ media, onOpen }: { media: Media[]; onOpen: (m: Media) => void }) {
+  return (
+    // Phones: a swipeable strip. Desktop: one row where each item's width follows its aspect ratio, so heights match.
+    <div className="flex gap-3 overflow-x-auto md:overflow-visible snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-1">
+      {media.map((m) => (
+        <button
+          key={m.src}
+          type="button"
+          onClick={() => onOpen(m)}
+          aria-label={`Enlarge: ${m.alt}`}
+          className="group relative shrink-0 h-44 md:h-auto md:shrink md:basis-0 snap-start overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-green-500"
+          style={{ aspectRatio: `${m.width} / ${m.height}`, flexGrow: m.width / m.height }}
+        >
+          {m.type === "video" ? (
+            <>
+              <video
+                data-autoplay
+                src={m.src}
+                poster={m.poster}
+                muted
+                loop
+                playsInline
+                preload="none"
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute left-2 bottom-2 px-2 py-0.5 rounded-md bg-black/60 text-white text-xs font-semibold">▶ Demo</span>
+            </>
+          ) : (
+            <Image src={m.src} alt="" width={m.width} height={m.height} unoptimized className="h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-300 group-hover:scale-105" />
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function AwardBadge({ award }: { award: string }) {
   return (
     <div className="flex flex-wrap gap-2 mt-3">
@@ -327,6 +379,29 @@ export default function Portfolio() {
   const mounted = isDarkMode !== null;
   const [menuOpen, setMenuOpen] = useState(false);
   const [showAllProjects, setShowAllProjects] = useState(false);
+  const [lightbox, setLightbox] = useState<Media | null>(null);
+
+  // Close the enlarged media with Escape
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightbox(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightbox]);
+
+  // Play looping demo videos only while on screen, and never with reduced motion
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(({ target, isIntersecting }) => {
+            const video = target as HTMLVideoElement;
+            if (isIntersecting) video.play().catch(() => {});
+            else video.pause();
+        });
+    }, { threshold: 0.25 });
+    document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]').forEach((v) => observer.observe(v));
+    return () => observer.disconnect();
+  }, []);
 
   // Follow live device theme changes until the visitor picks a theme with the toggle
   useEffect(() => {
@@ -684,7 +759,7 @@ export default function Portfolio() {
         <h3 className="text-3xl font-bold mb-12 border-l-4 border-green-600 dark:border-green-500 pl-4 text-neutral-900 dark:text-white">Projects</h3>
         <div className="space-y-6">
           {featuredProjects.map((project) => (
-            <div key={project.name} className="project-card opacity-0 relative overflow-hidden bg-white dark:bg-neutral-900 p-6 md:p-8 rounded-2xl shadow-md border border-neutral-200 dark:border-neutral-800 hover:border-green-300 dark:hover:border-green-800 transition-colors md:grid md:grid-cols-5 md:grid-rows-[auto_1fr] md:gap-x-8">
+            <div key={project.name} className="project-card opacity-0 relative overflow-hidden bg-white dark:bg-neutral-900 p-6 md:p-8 rounded-2xl shadow-md border border-neutral-200 dark:border-neutral-800 hover:border-green-300 dark:hover:border-green-800 transition-colors md:grid md:grid-cols-5 md:grid-rows-[auto_1fr_auto] md:gap-x-8">
               <div className="absolute inset-y-0 left-0 w-1 bg-green-600 dark:bg-green-500" aria-hidden="true" />
               <div className="md:col-span-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">{project.date}</span>
@@ -701,6 +776,11 @@ export default function Portfolio() {
                 <TechTags tech={project.tech} />
                 {project.links && <ProjectLinks links={project.links} />}
               </div>
+              {project.media && (
+                <div className="md:col-span-5 md:row-start-3 mt-6">
+                  <ProjectMedia media={project.media} onOpen={setLightbox} />
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -847,6 +927,50 @@ export default function Portfolio() {
             )}
         </div>
       </section>
+
+      {/* Enlarged media */}
+      {lightbox && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={lightbox.alt}
+          onClick={() => setLightbox(null)}
+          className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-4 bg-black/85 backdrop-blur-sm p-4 md:p-10"
+        >
+          <button
+            autoFocus
+            onClick={() => setLightbox(null)}
+            aria-label="Close"
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+          {lightbox.type === 'video' ? (
+            <video
+              src={lightbox.src}
+              poster={lightbox.poster}
+              autoPlay={!prefersReducedMotion()}
+              controls
+              muted
+              loop
+              playsInline
+              onClick={(e) => e.stopPropagation()}
+              className="max-h-[80vh] max-w-full rounded-lg"
+            />
+          ) : (
+            <Image
+              src={lightbox.src}
+              alt={lightbox.alt}
+              width={lightbox.width}
+              height={lightbox.height}
+              unoptimized
+              onClick={(e) => e.stopPropagation()}
+              className="max-h-[80vh] w-auto h-auto max-w-full rounded-lg"
+            />
+          )}
+          <p className="max-w-2xl text-center text-sm text-neutral-300">{lightbox.alt}</p>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="mt-16 py-8 text-center text-neutral-400 dark:text-neutral-600 text-sm">
