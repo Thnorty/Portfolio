@@ -328,6 +328,19 @@ export default function Portfolio() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showAllProjects, setShowAllProjects] = useState(false);
 
+  // Follow live device theme changes until the visitor picks a theme with the toggle
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = (e: MediaQueryListEvent) => {
+        try {
+            if (localStorage.getItem('theme')) return;
+        } catch {}
+        document.documentElement.classList.toggle('dark', e.matches);
+    };
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  }, []);
+
   const toggleTheme = () => {
     if (isDarkMode) {
         document.documentElement.classList.remove('dark');
