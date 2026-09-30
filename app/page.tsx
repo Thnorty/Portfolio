@@ -1,118 +1,289 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { animate, stagger, createTimeline, svg } from "animejs";
+import React, { useEffect, useRef, useSyncExternalStore } from "react";
+import Link from "next/link";
+import { animate, stagger, createTimeline, svg, type JSAnimation } from "animejs";
 
 // CV Data
+type Link = { label: string; href: string };
+
+type Project = {
+  name: string;
+  subtitle?: string;
+  date: string;
+  award?: string;
+  description: string;
+  tech: string[];
+  links?: Link[];
+};
+
 const cvData = {
   personal: {
     name: "OGUZ NURLU",
-    title: "MSc in Electronic & Computer Technology (IoT)",
+    title: "Software engineer based in Dublin",
     location: "Dublin, Ireland",
     email: "nurluoguz03@gmail.com",
-    phone: "+353 85 151 6418",
     linkedin: "https://linkedin.com/in/oguz-nurlu",
     github: "https://github.com/Thnorty",
     summary:
-      "Full Stack Developer and MSc student specializing in IoT, Data Analysis, and Machine Learning. Experienced in building cybersecurity platforms and automated content generation systems.",
+      "I hold an MSc in Electronic & Computer Technology (IoT) from Dublin City University with First Class Honours, and a BSc in Computer Engineering from TOBB University of Economics and Technology. My work spans full-stack and mobile products, LLM agents and computer vision, and low-level systems, from a hackathon-winning drone intelligence agent to a RISC-V CNN accelerator and eBPF/XDP packet filtering.",
   },
+  highlights: [
+    { value: "2nd", label: "nationally at ROKETSAN Level Up AI, plus the ROKETSAN AI Award" },
+    { value: "1.1", label: "First Class Honours, MSc at Dublin City University" },
+    { value: "300+", label: "active users on ETUPedia, published on the Play Store" },
+    { value: "4–6×", label: "cycle reduction from my RISC-V CNN accelerator in gem5" },
+  ],
   education: [
     {
       school: "Dublin City University",
       location: "Dublin, IE",
-      date: "Sep 2025 ‐ Present",
-      degree: "MSc in Electronic & Computer Technology (IoT)",
-      details: ["Courses: Data Analysis, Machine Learning, Wireless Communications"],
+      date: "Sep 2025 – Sep 2026",
+      degree: "MSc in Electronic & Computer Technology (Major in IoT)",
+      honours: "First Class Honours (1.1)",
+      details: [
+        { label: "Thesis", text: "Hardware Acceleration of Multi-Task Convolutional Neural Networks on RISC-V Architectures" },
+        { label: "Coursework", text: "Network Stack Implementation (Linux kernel internals in C), Data Analysis, Machine Learning, Wireless Communications, Security for Edge Networks" },
+      ],
     },
     {
       school: "TOBB University of Economics and Technology",
       location: "Ankara, TR",
       date: "2021 – 2025",
-      degree: "Bachelor’s in Computer Engineering",
+      degree: "BSc in Computer Engineering",
       details: [
-        "GPA: 2.88 / 4.00",
-        "Courses: Big Data, Parallel Processing, Deep Learning, Machine Learning, Computer Vision",
+        { label: "Graduation Project", text: "Automated Story Generation and Multimodal Rendering Engine" },
+        { label: "Coursework", text: "Big Data (AWS S3/Lambda, Kubernetes), Parallel Processing, Deep Learning, Machine Learning, Computer Vision" },
       ],
     },
   ],
   experience: [
     {
-      company: "STM",
-      role: "Full Stack Developer Intern",
-      date: "Sep – Dec 2024",
-      duration: "3 months",
+      company: "Dublin City University",
+      role: "Teaching Assistant & Demonstrator",
+      location: "Dublin, IE",
+      date: "Jan – May 2026",
       details: [
-        "Contributed to CyThreat, STM’s cyber threat intelligence portal.",
-        "Worked on frontend and backend, ensuring compatibility with existing code.",
-        "Enhanced authentication systems, logging mechanisms, and service integrations.",
-        "Technologies: React, Docker, Django REST APIs, 2FA, Logstash, Vulners API.",
+        "Module demonstrator for EEN1037 (Web Application Development).",
+        "Led weekly lab sessions, mentored students on full-stack architecture, and managed assignment evaluations.",
       ],
+      tech: [],
     },
     {
       company: "STM",
       role: "Full Stack Developer Intern",
-      date: "Jan – Apr 2024",
-      duration: "3 months",
+      location: "Ankara, TR",
+      date: "Sep – Dec 2024",
       details: [
-        "Developed and maintained frontend and backend components of CyThreat.",
-        "Implemented UI features, optimized performance, and integrated backend services.",
-        "Collaborated with the cybersecurity team to improve threat detection and response.",
-        "Technologies: React, Django, MySQL, Elasticsearch.",
+        "Contributed to CyThreat, STM’s cyber threat intelligence portal, keeping frontend and backend compatible.",
+        "Enhanced authentication (including 2FA), logging mechanisms, and external threat intelligence API integrations.",
       ],
+      tech: ["React", "Docker", "Django REST Framework", "Logstash", "Elasticsearch"],
+    },
+    {
+      company: "STM",
+      role: "Full Stack Developer Intern",
+      location: "Ankara, TR",
+      date: "Jan – Apr 2024",
+      details: [
+        "Developed and maintained responsive UI features and backend endpoints for the CyThreat platform.",
+        "Optimised database queries and API response latencies for large-scale security incident datasets.",
+      ],
+      tech: ["React", "Django", "MySQL", "Elasticsearch"],
     },
     {
       company: "Jotform",
       role: "Frontend Developer Intern",
+      location: "Ankara, TR",
       date: "May – Aug 2023",
-      duration: "3 months",
-      details: [
-        "Developed UI components for Jotform Salesforce app.",
-        "Technologies: React, HTML, CSS, JavaScript, SOQL.",
-      ],
+      details: ["Developed and optimised user interface components for the Jotform Salesforce integration."],
+      tech: ["React", "JavaScript", "HTML5", "CSS3", "SOQL"],
     },
     {
       company: "BTK Akademi",
       role: "Instructor",
+      location: "Ankara, TR",
       date: "Jan – Feb 2023",
       details: [
-        "Taught 'Introduction to Programming Using Java' to ~50 university students.",
-        "Created educational materials available on GitHub.",
+        "Delivered an intensive “Introduction to Programming Using Java” course to 50+ university students.",
+        "Designed the curriculum, assignments and sample projects from scratch, and published them open source.",
       ],
+      tech: ["Java"],
+      link: { label: "Course materials", href: "https://github.com/Thnorty/BTK" },
     },
   ],
   projects: [
     {
-      name: "Thalia App",
+      name: "Field-Report-Assisted Risk Agent",
+      date: "2026",
+      award: "National Hackathon 2nd Place · ROKETSAN AI Award",
       description:
-        "Automated system creating new episodes for a cartoon show using fine-tuned LLMs, image generation, and voice synthesis.",
+        "Captained a 6-person team at ROKETSAN Level Up AI, a 48-hour national hackathon for 72 engineers selected from ~2,500 applicants. Fused RF-DETR and YOLO with TTA and a WBF ensemble for aerial vehicle detection (0.863 val mAP50), then built an LLM agent that weighs drone detections, vehicle tracks and possibly misleading field reports, with a deterministic core enforcing 8 code-level guardrails. Also shipped a 15-tool chat agent and Karargah Gözü, a Flutter app with live replay, push alerts and Turkish voice questions.",
+      tech: ["RF-DETR", "YOLO", "LLM Agents", "Python", "Flutter", "Firebase"],
+      links: [{ label: "GitHub", href: "https://github.com/Thnorty/RoketsanLevelUp" }],
     },
     {
-      name: "ETUPedia App",
+      name: "RepForth",
+      subtitle: "Exercise Planner & Tracker",
+      date: "2026",
       description:
-        "Mobile app for students/teachers at TOBB ETÜ. 300+ users. Features forum and academic info.",
-      link: "https://play.google.com/store/apps/details?id=com.thnorty.etupedia",
+        "Local-first Android training app with a Wear OS companion, released at v1.0.2. A multi-module Gradle project with baseline profiles, a catalogue of 1,324 animated exercises, and full English and Turkish support. No account, no backend and no telemetry.",
+      tech: ["Kotlin", "Android", "Wear OS", "Gradle"],
+      links: [{ label: "GitHub", href: "https://github.com/Thnorty/RepForth" }],
     },
     {
-      name: "Yanındayım App",
+      name: "Cairn",
+      subtitle: "AI-Verified Habit Tracker",
+      date: "2026",
       description:
-        "2nd place in MobileAction Hackathon. Emergency assistance app for older adults/health conditions with AI chatbot.",
+        "Cross-platform habit tracker where every completion is proven by a photo that an AI verifier checks before it counts. Local-first, with Drift/SQLite offline storage and Supabase sync, plus subscriptions, localisation, notifications and home screen widgets.",
+      tech: ["Flutter", "Dart", "Supabase", "Riverpod", "Drift"],
+      links: [{ label: "GitHub", href: "https://github.com/Thnorty/cairn" }],
+    },
+    {
+      name: "Varlık Defteri",
+      subtitle: "Property & Investment Manager",
+      date: "2026",
+      description:
+        "Private asset management system: a React + TypeScript SPA on a Django REST API. Deeds, land, shops and cooperative shares share one abstract base model, and the app is network-isolated with no UI or API data loading before authentication.",
+      tech: ["React", "TypeScript", "Vite", "Tailwind", "Django REST"],
+    },
+    {
+      name: "RSVPro",
+      subtitle: "Speed Reading App",
+      date: "2026",
+      description:
+        "RSVP reader that flashes words at 100–1000+ WPM with Optimal Recognition Point alignment and pacing that adapts to punctuation and word length. Imports PDFs, tracks reading progress, and syncs accounts through Supabase.",
+      tech: ["React Native", "Expo Router", "TypeScript", "Supabase", "Zustand"],
+      links: [{ label: "GitHub", href: "https://github.com/Thnorty/RSVPro" }],
+    },
+    {
+      name: "ETUPedia",
+      date: "2024",
+      description:
+        "Social forum and academic directory for university students, grown to 300+ active users. Real-time feeds, push notifications, caching, full internationalisation and animated, themed navigation.",
+      tech: ["React Native", "Expo", "Django REST", "PostgreSQL", "Docker"],
+      links: [
+        { label: "Play Store", href: "https://play.google.com/store/apps/details?id=com.thnorty.etupedia" },
+        { label: "GitHub", href: "https://github.com/Thnorty/ETUPedia-frontend" },
+      ],
+    },
+    {
+      name: "TinyKITTINet",
+      subtitle: "Hardware-Accelerated Multi-Task CNN",
+      date: "2026",
+      description:
+        "33.7k-parameter INT8 CNN for road perception on KITTI (classification, bounding box and depth), running on a dedicated Verilog accelerator in a PicoRV32 soft-core SoC. 4–6× fewer cycles than out-of-order x86/RISC-V baselines in gem5, with bit-identical integer results verified from PyTorch QAT through C models to RTL testbenches.",
+      tech: ["Verilog", "RISC-V", "gem5", "PyTorch"],
+    },
+    {
+      name: "eBPF/XDP DDoS Mitigation",
+      date: "2026",
+      description:
+        "XDP program in C, loaded through BCC from Python, that drops fragmented ICMP floods at the driver before the kernel network stack allocates for them. Benchmarked against a Netfilter implementation under a Ping of Death style attack, and deployed on a Raspberry Pi.",
+      tech: ["C", "eBPF", "XDP", "BCC", "Python", "Linux kernel"],
+    },
+    {
+      name: "Vision-Language-Action Models",
+      subtitle: "Robotic Manipulation Research",
+      date: "2026 – Present",
+      description:
+        "Fine-tuning and evaluating OpenVLA and OpenVLA-OFT policies on long-horizon tasks like cooking and dishwashing, and studying modality bias: how visual attention decays across generated action sequences. Also extended the stable-worldmodel harness with a GRU-based world model, benchmarked on MuJoCo cube manipulation.",
+      tech: ["OpenVLA", "PyTorch", "MuJoCo"],
+    },
+    {
+      name: "3D Gaussian Splatting",
+      subtitle: "Reconstruction Pipeline",
+      date: "2026",
+      description:
+        "End-to-end scene reconstruction: structure-from-motion with COLMAP and GLOMAP on captured image sets, then Gaussian Splatting training and rendering with gsplat and Splatfacto, using Gaussian Grouping for object-level segmentation.",
+      tech: ["COLMAP", "GLOMAP", "gsplat", "Splatfacto", "viser"],
+    },
+    {
+      name: "ThalAI",
+      subtitle: "Multimodal Cartoon Episode Engine",
+      date: "2024 – 2025",
+      description:
+        "My undergraduate graduation project: a platform that generates complete audiovisual episodes of an animated series. Fine-tuned LLMs write scripts, scene breakdowns and dialogue, served by separate Django, LLM inference, text-to-speech and React Native services.",
+      tech: ["Django", "React Native", "Docker", "Generative AI"],
+    },
+    {
+      name: "SensoryPod",
+      subtitle: "IoT Companion App",
+      date: "2025",
+      description:
+        "Flutter control app for sensory IoT hardware: music and ambient sound playback, smart lighting scenes and sensor-driven motion control, from one codebase across iOS, Android, Web, Windows, macOS and Linux.",
+      tech: ["Flutter", "Dart", "IoT"],
+    },
+    {
+      name: "Yanındayım",
+      subtitle: "Elder-Care Emergency Assistant",
+      date: "2024",
+      award: "Hackathon 2nd Place",
+      description:
+        "Placed 2nd out of 30+ teams at MobileAction’s 24-hour hackathon. Background accelerometer-based fall detection automatically alerts emergency contacts.",
+      tech: ["React Native", "Gemini API"],
+      links: [{ label: "GitHub", href: "https://github.com/Thnorty/MobileActionHackathor-frontend" }],
+    },
+    {
+      name: "AI Mood Detector",
+      date: "2025",
+      description:
+        "Full-stack web app that recognises facial emotions in uploaded images, then generates personalised responses through the Gemini API. Built with React 19, Vite, Tailwind and Framer Motion on a Python deep-learning backend.",
+      tech: ["React 19", "Vite", "Tailwind", "Deep Learning", "Gemini API"],
+    },
+    {
+      name: "Browser Extensions & Games",
+      date: "2023 – 2026",
+      description:
+        "Published Chrome extensions, including a YouTube video summariser and an AI-detector analysis tool, and 2D games in Unity and Godot: Nine Bowls (a cat puzzle), Re Boot Repair Shop and SlotMatch.",
+      tech: ["JavaScript", "Unity", "Godot", "C#"],
+    },
+  ] as Project[],
+  skills: [
+    {
+      category: "Languages",
+      items: ["Python", "JavaScript", "TypeScript", "Dart", "Kotlin", "Java", "C", "C++", "C#", "SQL", "Verilog", "Bash"],
+    },
+    {
+      category: "Web & Mobile",
+      items: ["React", "React Native", "Expo", "Flutter", "Django REST Framework", "FastAPI", "REST API design", "Server-Sent Events", "Firebase Cloud Messaging", "Tailwind", "NativeWind", "styled-components", "Zustand", "Riverpod", "i18next"],
+    },
+    {
+      category: "Databases",
+      items: ["PostgreSQL", "MySQL", "SQLite", "Drift", "Supabase", "Elasticsearch", "Relational modelling", "Query & index optimisation"],
+    },
+    {
+      category: "Cloud & Infrastructure",
+      items: ["AWS (S3, Lambda)", "Kubernetes", "Docker", "Nginx", "Linux (Ubuntu, Arch)", "SLURM/HPC", "Gradle"],
+    },
+    {
+      category: "AI & Machine Learning",
+      items: ["PyTorch", "Hugging Face", "LLM fine-tuning", "Tool-calling LLM agents", "MCP agent tooling", "Vision-Language-Action models", "Computer Vision", "YOLO", "RF-DETR", "WBF ensembles", "Quantisation-Aware Training", "3D Gaussian Splatting", "MuJoCo"],
+    },
+    {
+      category: "Systems & Low Level",
+      items: ["Linux kernel networking", "eBPF/XDP", "Netfilter", "RISC-V (RV32/RV64, PicoRV32)", "Soft-core SoC bring-up", "gem5", "Verilog", "Vivado"],
+    },
+    {
+      category: "Engineering Practice",
+      items: ["Git", "Code review", "Automated regression harnesses", "CI workflows", "Agile teams", "Open-source releases"],
+    },
+    {
+      category: "Game Development",
+      items: ["Unity", "Godot"],
     },
   ],
-  skills: {
-    languages: ["Java", "Python", "C", "SQL", "JavaScript", "TypeScript"],
-    technologies: [
-      "Elasticsearch",
-      "Spark",
-      "Docker",
-      "Django",
-      "React",
-      "React Native",
-      "REST API",
-      "Git",
-    ],
-    humanLanguages: ["English (Native/Fluent)", "Turkish (Native)", "German (A2)"],
-  },
+  spokenLanguages: ["English (Fluent · TOEFL 97, IELTS 7.0)", "Turkish (Native)", "German (A2)"],
 };
+
+const subscribeToTheme = (onChange: () => void) => {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  return () => observer.disconnect();
+};
+
+const getThemeSnapshot = () => document.documentElement.classList.contains('dark');
 
 export default function Portfolio() {
   const headerRef = useRef<HTMLElement>(null);
@@ -123,36 +294,18 @@ export default function Portfolio() {
   const eduRef = useRef<HTMLElement>(null);
   const contactRef = useRef<HTMLElement>(null);
   
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    // Check system preference on mount
-    if (typeof window !== 'undefined') {
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        // Check local storage or default to system
-        const storedTheme = localStorage.getItem('theme');
-        
-        if (storedTheme === 'dark' || (!storedTheme && systemPrefersDark)) {
-            setIsDarkMode(true);
-            document.documentElement.classList.add('dark');
-        } else {
-            setIsDarkMode(false);
-            document.documentElement.classList.remove('dark');
-        }
-    }
-  }, []);
+  // The inline script in layout.tsx sets the `dark` class before hydration; mirror it here.
+  // The server snapshot is null, so the toggle icon renders only after mount.
+  const isDarkMode = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, () => null);
+  const mounted = isDarkMode !== null;
 
   const toggleTheme = () => {
     if (isDarkMode) {
         document.documentElement.classList.remove('dark');
         localStorage.setItem('theme', 'light');
-        setIsDarkMode(false);
     } else {
         document.documentElement.classList.add('dark');
         localStorage.setItem('theme', 'dark');
-        setIsDarkMode(true);
     }
   };
 
@@ -229,58 +382,63 @@ export default function Portfolio() {
         { ref: contactRef, selector: '.group' }
     ];
 
-    const animations: any[] = [];
+    // One scrubbed animation per element, driven by that element's own position,
+    // so long sections (e.g. many projects on mobile) reveal items as they scroll into view.
+    const animations: { anim: JSAnimation; element: HTMLElement; section: HTMLElement }[] = [];
 
-    // Create a timeline for each section
     sections.forEach(({ ref, selector }) => {
         if (!ref.current) return;
-        const target = ref.current;
+        const section = ref.current;
         
         // Ensure initial state
-        target.classList.remove('opacity-0');
-        const elements = target.querySelectorAll(selector);
-        
-        // Initial setup for scrubbed elements
-        elements.forEach((el: any) => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(50px)';
-        });
+        section.classList.remove('opacity-0');
 
-        const tl = createTimeline({
-            autoplay: false,
-            duration: 1000,
-            playbackEase: 'linear'
-        });
+        section.querySelectorAll<HTMLElement>(selector).forEach((element) => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(50px)';
 
-        tl.add(elements, {
-            opacity: [0, 1],
-            translateY: [50, 0],
-            delay: stagger(100),
-            duration: 1000,
-            ease: 'outQuad'
-        });
+            const anim = animate(element, {
+                opacity: [0, 1],
+                translateY: [50, 0],
+                duration: 1000,
+                ease: 'outQuad',
+                autoplay: false
+            });
 
-        animations.push({ tl, element: target });
+            animations.push({ anim, element, section });
+        });
     });
+
+    // Layout position, unaffected by the transforms the animations apply
+    const pageOffset = (el: HTMLElement) => {
+        let top = 0;
+        let left = 0;
+        let node: HTMLElement | null = el;
+        while (node) {
+            top += node.offsetTop;
+            left += node.offsetLeft;
+            node = node.offsetParent as HTMLElement | null;
+        }
+        return { top, left };
+    };
 
     const onScroll = () => {
         const windowHeight = window.innerHeight;
         const scrollY = window.scrollY;
 
-        animations.forEach(({ tl, element }) => {
-            const rect = element.getBoundingClientRect();
-            // Start animating when the top of the element enters the bottom of the viewport
-            // End when the center of the element is in the center of the viewport (or slightly offset)
-            
-            const elementTop = rect.top + scrollY;
-            const elementHeight = rect.height;
-            const start = elementTop - windowHeight * 0.9; // Start slightly before it enters
-            const end = elementTop + elementHeight * 0.2; // End when scrolled in a bit
+        animations.forEach(({ anim, element, section }) => {
+            const el = pageOffset(element);
+            const sec = pageOffset(section);
+            // Items further right start slightly later, keeping a left-to-right stagger within a row
+            const lag = ((el.left - sec.left) / section.offsetWidth) * windowHeight * 0.15;
+
+            const start = el.top - windowHeight * 0.95 + lag; // Start as the item enters the viewport
+            const end = start + windowHeight * 0.3; // Fully visible after scrolling a bit further
 
             let progress = (scrollY - start) / (end - start);
             progress = Math.max(0, Math.min(1, progress));
             
-            tl.seek(tl.duration * progress);
+            anim.seek(anim.duration * progress);
         });
         
         // Parallax for Hero
@@ -323,7 +481,7 @@ export default function Portfolio() {
       {/* Navigation / Header */}
       <header className="fixed top-0 w-full bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md z-50 border-b border-neutral-200 dark:border-neutral-800 transition-colors duration-300">
         <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
-          <a href="/" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="font-bold text-xl tracking-tighter text-neutral-900 dark:text-white cursor-pointer hover:text-green-600 dark:hover:text-green-400 transition-colors">ON.</a>
+          <Link href="/" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="font-bold text-xl tracking-tighter text-neutral-900 dark:text-white cursor-pointer hover:text-green-600 dark:hover:text-green-400 transition-colors">ON.</Link>
           <div className="flex items-center gap-6">
             <nav className="hidden md:flex gap-6 text-sm font-medium">
                 <a href="#about" onClick={(e) => handleScroll(e, 'about')} onMouseEnter={handleLinkHover} onMouseLeave={handleLinkLeave} className="text-neutral-700 dark:text-neutral-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">About</a>
@@ -353,7 +511,7 @@ export default function Portfolio() {
       {/* Hero Section */}
       <section ref={headerRef} className="pt-32 pb-20 px-6 max-w-5xl mx-auto min-h-[80vh] flex flex-col justify-center">
         <div className="hero-anim opacity-0 mb-6 flex flex-wrap items-baseline gap-4">
-            <span className="text-5xl md:text-7xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">Hi, I'm</span>
+            <span className="text-5xl md:text-7xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">Hi, I&apos;m</span>
             <div className="inline-block">
                 <svg width="400" height="1" className="overflow-visible w-70 md:w-100">
                      <text x="0" y="0" 
@@ -366,7 +524,7 @@ export default function Portfolio() {
             </div>
         </div>
         <p className="hero-anim opacity-0 text-xl md:text-2xl text-neutral-600 dark:text-neutral-400 max-w-2xl leading-relaxed mb-8">
-          {cvData.personal.title}. Specialists in IoT, Machine Learning, and Full Stack Development.
+          {cvData.personal.title}, building full-stack and mobile products, AI agents, and hardware-accelerated machine learning.
         </p>
         <div className="hero-anim opacity-0 flex gap-4">
           <a href="#contact" onClick={(e) => handleScroll(e, 'contact')} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="px-8 py-3 bg-green-600 dark:bg-green-600 text-white font-semibold rounded-full shadow-lg shadow-green-600/30 hover:bg-green-700 dark:hover:bg-green-500 transition-colors">
@@ -387,9 +545,16 @@ export default function Portfolio() {
       <section id="about" ref={aboutRef} className="py-20 px-6 max-w-5xl mx-auto opacity-0 transition-opacity duration-500">
         <h3 className="anim-item text-3xl font-bold mb-8 text-neutral-900 dark:text-white">About Me</h3>
         <p className="anim-item text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed max-w-3xl">
-          {cvData.personal.summary} Currently based in {cvData.personal.location}. 
-          I have a passion for building robust full-stack applications and exploring the frontiers of AI and IoT technologies.
+          {cvData.personal.summary} Currently based in {cvData.personal.location}.
         </p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+          {cvData.highlights.map((item, idx) => (
+            <div key={idx} className="anim-item p-6 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm transition-colors">
+              <div className="text-3xl md:text-4xl font-extrabold text-green-600 dark:text-green-400 tracking-tight">{item.value}</div>
+              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400 leading-snug">{item.label}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Experience Section */}
@@ -400,6 +565,7 @@ export default function Portfolio() {
             <div key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="exp-card opacity-0 grid md:grid-cols-4 gap-4 p-8 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm transition-colors">
               <div className="text-neutral-500 dark:text-neutral-400 text-sm font-semibold tracking-wider uppercase">
                 {job.date}
+                <p className="mt-1 text-xs font-medium normal-case tracking-normal">{job.location}</p>
               </div>
               <div className="md:col-span-3">
                 <h4 className="text-xl font-bold text-neutral-900 dark:text-white">{job.role}</h4>
@@ -409,6 +575,18 @@ export default function Portfolio() {
                     <li key={i}>{detail}</li>
                   ))}
                 </ul>
+                {job.tech.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {job.tech.map((t) => (
+                      <span key={t} className="px-2.5 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-md text-xs font-medium transition-colors">{t}</span>
+                    ))}
+                  </div>
+                )}
+                {job.link && (
+                  <a href={job.link.href} target="_blank" rel="noopener noreferrer" className="inline-block mt-4 text-green-600 dark:text-green-400 text-sm font-semibold hover:underline">
+                    {job.link.label} &rarr;
+                  </a>
+                )}
               </div>
             </div>
           ))}
@@ -422,16 +600,38 @@ export default function Portfolio() {
           {cvData.projects.map((project, idx) => (
             <div key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="project-card opacity-0 bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-md border border-neutral-100 dark:border-neutral-800 flex flex-col justify-between transition-colors">
               <div>
-                <h4 className="text-xl font-bold mb-3 text-neutral-900 dark:text-white">{project.name}</h4>
-                <p className="text-neutral-600 dark:text-neutral-400 mb-6 text-sm leading-relaxed">
+                <div className="flex items-baseline justify-between gap-3">
+                  <h4 className="text-xl font-bold text-neutral-900 dark:text-white">{project.name}</h4>
+                  <span className="shrink-0 text-xs font-semibold text-neutral-500 dark:text-neutral-400">{project.date}</span>
+                </div>
+                {project.subtitle && (
+                  <p className="text-green-600 dark:text-green-400 text-sm font-medium mt-1">{project.subtitle}</p>
+                )}
+                {project.award && (
+                  <span className="inline-block mt-3 px-2.5 py-1 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-900 rounded-full text-xs font-semibold transition-colors">
+                    {project.award}
+                  </span>
+                )}
+                <p className="text-neutral-600 dark:text-neutral-400 mt-3 mb-5 text-sm leading-relaxed">
                   {project.description}
                 </p>
               </div>
-              {project.link && (
-                <a href={project.link} target="_blank" className="text-green-600 dark:text-green-400 text-sm font-semibold hover:underline mt-auto">
-                  View Project &rarr;
-                </a>
-              )}
+              <div className="mt-auto">
+                <div className="flex flex-wrap gap-1.5">
+                  {project.tech.map((t) => (
+                    <span key={t} className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-md text-xs font-medium transition-colors">{t}</span>
+                  ))}
+                </div>
+                {project.links && (
+                  <div className="flex gap-4 mt-4">
+                    {project.links.map((link) => (
+                      <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="text-green-600 dark:text-green-400 text-sm font-semibold hover:underline">
+                        {link.label} &rarr;
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -446,11 +646,18 @@ export default function Portfolio() {
                 <div>
                     <h4 className="text-xl font-bold text-neutral-900 dark:text-white">{edu.school}</h4>
                     <p className="text-neutral-800 dark:text-neutral-200 font-medium mt-1">{edu.degree}</p>
-                    <div className="mt-4 space-y-1">
-                        {edu.details.map((d, i) => <p key={i} className="text-neutral-600 dark:text-neutral-400 text-sm">{d}</p>)}
+                    {edu.honours && (
+                        <p className="text-green-600 dark:text-green-400 text-sm font-semibold mt-1">{edu.honours}</p>
+                    )}
+                    <div className="mt-4 space-y-2">
+                        {edu.details.map((d, i) => (
+                            <p key={i} className="text-neutral-600 dark:text-neutral-400 text-sm">
+                                <span className="font-semibold text-neutral-700 dark:text-neutral-300">{d.label}:</span> {d.text}
+                            </p>
+                        ))}
                     </div>
                 </div>
-                <div className="mt-4 md:mt-0 text-right">
+                <div className="mt-4 md:mt-0 md:ml-8 shrink-0 md:text-right">
                     <span className="inline-block px-3 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-full text-xs font-semibold text-neutral-600 dark:text-neutral-300 transition-colors">{edu.date}</span>
                     <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">{edu.location}</p>
                 </div>
@@ -463,21 +670,23 @@ export default function Portfolio() {
       <section id="skills" ref={skillsRef} className="py-20 px-6 max-w-5xl mx-auto opacity-0 transition-opacity duration-500">
         <h3 className="text-3xl font-bold mb-12 border-l-4 border-green-600 dark:border-green-500 pl-4 text-neutral-900 dark:text-white">Skills</h3>
         
-        <div className="mb-8">
-            <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Core Technologies</h4>
-            <div className="flex flex-wrap gap-2">
-                {cvData.skills.languages.concat(cvData.skills.technologies).map((skill, idx) => (
-                    <span key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="skill-badge opacity-0 px-4 py-2 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 rounded-lg text-sm font-medium border border-neutral-200 dark:border-neutral-800 shadow-sm cursor-default inline-block transition-colors">
-                        {skill}
-                    </span>
-                ))}
+        {cvData.skills.map((group) => (
+            <div key={group.category} className="mb-8">
+                <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">{group.category}</h4>
+                <div className="flex flex-wrap gap-2">
+                    {group.items.map((skill, idx) => (
+                        <span key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="skill-badge opacity-0 px-4 py-2 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 rounded-lg text-sm font-medium border border-neutral-200 dark:border-neutral-800 shadow-sm cursor-default inline-block transition-colors">
+                            {skill}
+                        </span>
+                    ))}
+                </div>
             </div>
-        </div>
+        ))}
 
         <div>
-            <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Languages</h4>
+            <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Spoken Languages</h4>
             <div className="flex flex-wrap gap-2">
-                {cvData.skills.humanLanguages.map((lang, idx) => (
+                {cvData.spokenLanguages.map((lang, idx) => (
                     <span key={idx} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="skill-badge opacity-0 px-4 py-2 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 rounded-lg text-sm font-medium border border-neutral-200 dark:border-neutral-800 shadow-sm cursor-default inline-block transition-colors">
                         {lang}
                     </span>
@@ -488,7 +697,7 @@ export default function Portfolio() {
 
       {/* Contact Section */}
       <section id="contact" ref={contactRef} className="py-20 px-6 max-w-5xl mx-auto opacity-0 transition-opacity duration-500">
-        <h3 className="text-3xl font-bold mb-12 border-l-4 border-green-600 dark:border-green-500 pl-4 text-neutral-900 dark:text-white">Let's Connect</h3>
+        <h3 className="text-3xl font-bold mb-12 border-l-4 border-green-600 dark:border-green-500 pl-4 text-neutral-900 dark:text-white">Let&apos;s Connect</h3>
         <div className="grid md:grid-cols-3 gap-6">
             <a href={`mailto:${cvData.personal.email}`} onMouseEnter={handleHover} onMouseLeave={handleHoverLeave} className="flex flex-col items-center text-center p-8 bg-white dark:bg-neutral-900 rounded-2xl shadow-md border-2 border-neutral-100 dark:border-neutral-800 transition-colors hover:border-green-200 dark:hover:border-green-800 group">
                 <div className="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-full text-green-600 dark:text-green-400 mb-4 group-hover:bg-green-50 dark:group-hover:bg-neutral-700 transition-colors">

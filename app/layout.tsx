@@ -20,7 +20,7 @@ const anta = Anta({
 
 export const metadata: Metadata = {
   title: "Oguz Nurlu | Portfolio",
-  description: "Portfolio website of Oguz Nurlu, a passionate software developer specializing in full-stack web development, showcasing projects, skills, and experience.",
+  description: "Portfolio of Oguz Nurlu, a Dublin-based software engineer working across full-stack and mobile development, AI agents and computer vision, and hardware-accelerated machine learning.",
 };
 
 export default function RootLayout({
